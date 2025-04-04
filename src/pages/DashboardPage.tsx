@@ -40,7 +40,7 @@ const DashboardPage: React.FC = () => {
       </div>
       
       {!hasCompletedJournal && (
-        <Alert variant="warning">
+        <Alert variant="destructive">
           <AlertTitle>Daily Journal Required</AlertTitle>
           <AlertDescription>
             Complete your daily journal before trading to improve discipline and focus.

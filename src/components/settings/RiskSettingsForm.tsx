@@ -42,15 +42,21 @@ const formSchema = z.object({
   }),
 });
 
+type FormValues = z.infer<typeof formSchema>;
+
 const RiskSettingsForm: React.FC = () => {
   const { state, updateRiskSettings } = useAppContext();
   
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: state.riskSettings,
+    defaultValues: {
+      initialCapital: state.riskSettings.initialCapital,
+      dailyProfitTarget: state.riskSettings.dailyProfitTarget,
+      maxDailyRisk: state.riskSettings.maxDailyRisk,
+    },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = (values: FormValues) => {
     updateRiskSettings(values);
     toast.success('Risk settings updated');
   };
