@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,13 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Trading app specific colors
+				profit: '#38A169',
+				loss: '#E53E3E',
+				neutral: '#718096',
+				navy: '#1A365D',
+				lightblue: '#EBF8FF'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
