@@ -57,7 +57,14 @@ const RiskSettingsForm: React.FC = () => {
   });
 
   const onSubmit = (values: FormValues) => {
-    updateRiskSettings(values);
+    // Ensure all values are filled before updating
+    const updatedSettings = {
+      initialCapital: values.initialCapital,
+      dailyProfitTarget: values.dailyProfitTarget,
+      maxDailyRisk: values.maxDailyRisk,
+    };
+    
+    updateRiskSettings(updatedSettings);
     toast.success('Risk settings updated');
   };
 

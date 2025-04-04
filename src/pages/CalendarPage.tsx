@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -103,7 +104,7 @@ const CalendarPage: React.FC = () => {
                   trading: "bg-yellow-100 text-yellow-800",
                   journal: "bg-blue-100 text-blue-800",
                 }}
-                modifierStyles={{
+                modifiersStyles={{
                   trading: { backgroundColor: "var(--yellow-100)", color: "var(--yellow-800)" },
                   journal: { backgroundColor: "var(--blue-100)", color: "var(--blue-800)" }
                 }}
