@@ -11,7 +11,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarProvider,
-  SidebarTrigger,
   SidebarFooter
 } from '@/components/ui/sidebar';
 import { 
@@ -47,7 +46,7 @@ const AppLayout: React.FC = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-slate-50">
-        <Sidebar className="bg-navy text-white">
+        <Sidebar className="bg-navy text-white" collapsible="none">
           <SidebarHeader className="py-6">
             <div className="text-xl font-bold px-6">Trade Compass</div>
           </SidebarHeader>
@@ -102,8 +101,7 @@ const AppLayout: React.FC = () => {
         
         <main className="flex-1 overflow-auto">
           <header className="bg-white border-b p-4 flex items-center">
-            <SidebarTrigger />
-            <div className="ml-4 font-medium">
+            <div className="font-medium">
               {menuItems.find(item => item.path === location.pathname)?.title || 'Trade Compass'}
             </div>
             {!hasCompletedJournal && (
