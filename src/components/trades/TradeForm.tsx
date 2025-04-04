@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -5,6 +6,7 @@ import { z } from 'zod';
 import { format } from 'date-fns';
 import { CalendarIcon, AlertTriangle } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
 
 import { cn } from '@/lib/utils';
@@ -58,10 +60,10 @@ const formSchema = z.object({
     required_error: 'Profit/loss percentage is required',
     invalid_type_error: 'Must be a number'
   }),
-  riskRewardRatio: z.number({ 
-    required_error: 'Risk/reward ratio is required',
+  leverage: z.number({ 
+    required_error: 'Leverage is required',
     invalid_type_error: 'Must be a number'
-  }),
+  }).min(1, { message: 'Leverage must be at least 1' }),
   notes: z.string().optional(),
   isMistake: z.boolean().default(false),
   mistakeTypeId: z.string().optional(),
@@ -80,7 +82,8 @@ const TradeForm: React.FC<TradeFormProps> = ({
   onCancel
 }) => {
   const { state, hasDailyJournal, checkRiskLimit } = useAppContext();
-  const { setups, mistakeTypes } = state;
+  const { t } = useLanguage();
+  const { setups, mistakeTypes, assets } = state;
   
   const defaultValues = trade ? {
     ...trade,
@@ -93,7 +96,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
     exitTime: new Date(),
     financialResult: 0,
     profitLossPercentage: 0,
-    riskRewardRatio: 0,
+    leverage: 1,
     notes: '',
     isMistake: false,
     mistakeTypeId: undefined,
@@ -127,8 +130,8 @@ const TradeForm: React.FC<TradeFormProps> = ({
   return (
     <Card className="w-full max-w-3xl">
       <CardHeader>
-        <CardTitle>{trade ? 'Edit Trade' : 'Log New Trade'}</CardTitle>
-        <CardDescription>Record the details of your trade</CardDescription>
+        <CardTitle>{trade ? t('trade.edit') : t('trade.new')}</CardTitle>
+        <CardDescription>{t('trade.details')}</CardDescription>
       </CardHeader>
       <CardContent>
         {!hasDailyJournal() && (
@@ -150,10 +153,24 @@ const TradeForm: React.FC<TradeFormProps> = ({
                 name="asset"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Asset (Symbol)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g. AAPL, BTC, EUR/USD" {...field} />
-                    </FormControl>
+                    <FormLabel>{t('trade.asset')}</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select asset" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {assets.map((asset) => (
+                          <SelectItem key={asset.id} value={asset.symbol}>
+                            {asset.symbol}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -165,7 +182,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                 name="setupId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Setup</FormLabel>
+                    <FormLabel>{t('trade.setup')}</FormLabel>
                     <Select 
                       onValueChange={field.onChange} 
                       defaultValue={field.value}
@@ -194,7 +211,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                 name="direction"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Direction</FormLabel>
+                    <FormLabel>{t('trade.direction')}</FormLabel>
                     <Select 
                       onValueChange={field.onChange} 
                       defaultValue={field.value}
@@ -205,8 +222,8 @@ const TradeForm: React.FC<TradeFormProps> = ({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Buy">Buy</SelectItem>
-                        <SelectItem value="Sell">Sell</SelectItem>
+                        <SelectItem value="Buy">{t('trade.buy')}</SelectItem>
+                        <SelectItem value="Sell">{t('trade.sell')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -220,7 +237,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                 name="trendPosition"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Trend Position</FormLabel>
+                    <FormLabel>{t('trade.trend')}</FormLabel>
                     <Select 
                       onValueChange={field.onChange} 
                       defaultValue={field.value}
@@ -231,8 +248,8 @@ const TradeForm: React.FC<TradeFormProps> = ({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="With">With Trend</SelectItem>
-                        <SelectItem value="Against">Against Trend</SelectItem>
+                        <SelectItem value="With">{t('trade.withTrend')}</SelectItem>
+                        <SelectItem value="Against">{t('trade.againstTrend')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -246,7 +263,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                 name="entryTime"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>Entry Time</FormLabel>
+                    <FormLabel>{t('trade.entryTime')}</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -272,7 +289,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                           selected={field.value}
                           onSelect={field.onChange}
                           initialFocus
-                          className="pointer-events-auto"
+                          className={cn("p-3 pointer-events-auto")}
                         />
                         <div className="p-3 border-t border-border">
                           <Input
@@ -299,7 +316,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                 name="exitTime"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>Exit Time</FormLabel>
+                    <FormLabel>{t('trade.exitTime')}</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -325,7 +342,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                           selected={field.value}
                           onSelect={field.onChange}
                           initialFocus
-                          className="pointer-events-auto"
+                          className={cn("p-3 pointer-events-auto")}
                         />
                         <div className="p-3 border-t border-border">
                           <Input
@@ -352,7 +369,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                 name="financialResult"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Financial Result ($)</FormLabel>
+                    <FormLabel>{t('trade.financialResult')}</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
@@ -373,7 +390,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                 name="profitLossPercentage"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Profit/Loss Percentage (%)</FormLabel>
+                    <FormLabel>{t('trade.profitLoss')}</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
@@ -388,20 +405,21 @@ const TradeForm: React.FC<TradeFormProps> = ({
                 )}
               />
               
-              {/* Risk/Reward Ratio */}
+              {/* Leverage */}
               <FormField
                 control={form.control}
-                name="riskRewardRatio"
+                name="leverage"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Risk/Reward Ratio</FormLabel>
+                    <FormLabel>{t('trade.leverage')}</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
-                        step="0.01"
-                        placeholder="0.00"
+                        step="1"
+                        min="1"
+                        placeholder="1"
                         {...field} 
-                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                        onChange={(e) => field.onChange(parseInt(e.target.value))}
                       />
                     </FormControl>
                     <FormMessage />
@@ -416,7 +434,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Trade Notes</FormLabel>
+                  <FormLabel>{t('trade.notes')}</FormLabel>
                   <FormControl>
                     <Textarea 
                       placeholder="What did you observe during this trade?"
@@ -438,10 +456,10 @@ const TradeForm: React.FC<TradeFormProps> = ({
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">
-                        Was this trade a mistake?
+                        {t('trade.mistake')}
                       </FormLabel>
                       <FormDescription>
-                        Mark trades that violated your trading rules or had execution errors
+                        {t('trade.mistakeDescription')}
                       </FormDescription>
                     </div>
                     <FormControl>
@@ -461,7 +479,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                   name="mistakeTypeId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Type of Mistake</FormLabel>
+                      <FormLabel>{t('trade.mistakeType')}</FormLabel>
                       <Select 
                         onValueChange={field.onChange} 
                         defaultValue={field.value}
@@ -498,9 +516,9 @@ const TradeForm: React.FC<TradeFormProps> = ({
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
-                      <FormLabel>Save as Model Trade</FormLabel>
+                      <FormLabel>{t('trade.modelTrade')}</FormLabel>
                       <FormDescription>
-                        Mark this as an exemplary trade to reference in the future
+                        {t('trade.modelDescription')}
                       </FormDescription>
                     </div>
                   </FormItem>
@@ -510,10 +528,10 @@ const TradeForm: React.FC<TradeFormProps> = ({
             
             <CardFooter className="flex justify-between px-0">
               <Button variant="outline" type="button" onClick={onCancel}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={!hasDailyJournal()}>
-                {trade ? 'Update Trade' : 'Log Trade'}
+                {trade ? t('trade.update') : t('trade.log')}
               </Button>
             </CardFooter>
           </form>

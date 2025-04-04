@@ -9,6 +9,11 @@ export type MistakeType = {
   name: string;
 };
 
+export type AssetType = {
+  id: string;
+  symbol: string;
+};
+
 export type Direction = 'Buy' | 'Sell';
 export type TrendPosition = 'With' | 'Against';
 
@@ -22,7 +27,7 @@ export type Trade = {
   exitTime: Date;
   financialResult: number;
   profitLossPercentage: number;
-  riskRewardRatio: number;
+  leverage: number;
   notes: string;
   isMistake: boolean;
   mistakeTypeId?: string;

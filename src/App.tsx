@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider } from "@/context/AppContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 import AppLayout from "@/components/layout/AppLayout";
 import DashboardPage from "@/pages/DashboardPage";
 import JournalPage from "@/pages/JournalPage";
@@ -20,21 +21,23 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AppProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<AppLayout />}>
-              <Route index element={<DashboardPage />} />
-              <Route path="journal" element={<JournalPage />} />
-              <Route path="trades" element={<TradesPage />} />
-              <Route path="analytics" element={<AnalyticsPage />} />
-              <Route path="calendar" element={<CalendarPage />} />
-              <Route path="settings" element={<SettingsPage />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <LanguageProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<AppLayout />}>
+                <Route index element={<DashboardPage />} />
+                <Route path="journal" element={<JournalPage />} />
+                <Route path="trades" element={<TradesPage />} />
+                <Route path="analytics" element={<AnalyticsPage />} />
+                <Route path="calendar" element={<CalendarPage />} />
+                <Route path="settings" element={<SettingsPage />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </LanguageProvider>
       </AppProvider>
     </TooltipProvider>
   </QueryClientProvider>

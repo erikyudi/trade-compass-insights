@@ -1,6 +1,5 @@
-
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { Trade, DailyJournal, RiskSettings, SetupType, MistakeType } from '@/types';
+import { Trade, DailyJournal, RiskSettings, SetupType, MistakeType, AssetType } from '@/types';
 import { toast } from 'sonner';
 
 // Default setups and mistake types
@@ -19,6 +18,14 @@ const DEFAULT_MISTAKE_TYPES: MistakeType[] = [
   { id: '5', name: 'Position Sizing Error' },
 ];
 
+const DEFAULT_ASSETS: AssetType[] = [
+  { id: '1', symbol: 'EURUSD' },
+  { id: '2', symbol: 'GBPUSD' },
+  { id: '3', symbol: 'BTCUSD' },
+  { id: '4', symbol: 'AAPL' },
+  { id: '5', symbol: 'MSFT' },
+];
+
 // Initial state
 type AppState = {
   trades: Trade[];
@@ -26,6 +33,7 @@ type AppState = {
   riskSettings: RiskSettings;
   setups: SetupType[];
   mistakeTypes: MistakeType[];
+  assets: AssetType[];
   dailyTradeProfit: number;
   dailyRiskUsed: number;
 };
@@ -40,6 +48,7 @@ const initialState: AppState = {
   },
   setups: DEFAULT_SETUPS,
   mistakeTypes: DEFAULT_MISTAKE_TYPES,
+  assets: DEFAULT_ASSETS,
   dailyTradeProfit: 0,
   dailyRiskUsed: 0,
 };
@@ -88,6 +97,8 @@ type ActionType =
   | { type: 'DELETE_SETUP'; payload: string }
   | { type: 'ADD_MISTAKE_TYPE'; payload: Omit<MistakeType, 'id'> }
   | { type: 'DELETE_MISTAKE_TYPE'; payload: string }
+  | { type: 'ADD_ASSET'; payload: Omit<AssetType, 'id'> }
+  | { type: 'DELETE_ASSET'; payload: string }
   | { type: 'RESET_DAILY_METRICS' };
 
 // Reducer
@@ -115,12 +126,10 @@ const appReducer = (state: AppState, action: ActionType): AppState => {
       );
       
       // For simplicity, we'll calculate risk used as sum of potential losses
-      // In a real app this would be more sophisticated
       const dailyRiskUsed = dailyTrades
-        .filter(trade => trade.riskRewardRatio > 0)
+        .filter(trade => trade.financialResult < 0)
         .reduce((sum, trade) => {
-          const potentialLoss = Math.abs(trade.financialResult / trade.riskRewardRatio);
-          return sum + potentialLoss;
+          return sum + Math.abs(trade.financialResult);
         }, 0) / state.riskSettings.initialCapital * 100;
         
       newState = {
@@ -149,10 +158,9 @@ const appReducer = (state: AppState, action: ActionType): AppState => {
       );
       
       const dailyRiskUsed = dailyTrades
-        .filter(trade => trade.riskRewardRatio > 0)
+        .filter(trade => trade.financialResult < 0)
         .reduce((sum, trade) => {
-          const potentialLoss = Math.abs(trade.financialResult / trade.riskRewardRatio);
-          return sum + potentialLoss;
+          return sum + Math.abs(trade.financialResult);
         }, 0) / state.riskSettings.initialCapital * 100;
       
       newState = {
@@ -179,10 +187,9 @@ const appReducer = (state: AppState, action: ActionType): AppState => {
       );
       
       const dailyRiskUsed = dailyTrades
-        .filter(trade => trade.riskRewardRatio > 0)
+        .filter(trade => trade.financialResult < 0)
         .reduce((sum, trade) => {
-          const potentialLoss = Math.abs(trade.financialResult / trade.riskRewardRatio);
-          return sum + potentialLoss;
+          return sum + Math.abs(trade.financialResult);
         }, 0) / state.riskSettings.initialCapital * 100;
       
       newState = {
@@ -259,6 +266,27 @@ const appReducer = (state: AppState, action: ActionType): AppState => {
       break;
     }
     
+    case 'ADD_ASSET': {
+      const newAsset = {
+        ...action.payload,
+        id: crypto.randomUUID(),
+      };
+      
+      newState = {
+        ...state,
+        assets: [...state.assets, newAsset]
+      };
+      break;
+    }
+    
+    case 'DELETE_ASSET': {
+      newState = {
+        ...state,
+        assets: state.assets.filter(asset => asset.id !== action.payload)
+      };
+      break;
+    }
+    
     case 'RESET_DAILY_METRICS': {
       newState = {
         ...state,
@@ -294,6 +322,8 @@ type AppContextType = {
   deleteSetup: (id: string) => void;
   addMistakeType: (mistakeType: Omit<MistakeType, 'id'>) => void;
   deleteMistakeType: (id: string) => void;
+  addAsset: (asset: Omit<AssetType, 'id'>) => void;
+  deleteAsset: (id: string) => void;
   resetDailyMetrics: () => void;
   hasDailyJournal: () => boolean;
   getDailyRiskStatus: () => 'safe' | 'warning' | 'danger';
@@ -373,6 +403,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     deleteSetup: (id) => dispatch({ type: 'DELETE_SETUP', payload: id }),
     addMistakeType: (mistakeType) => dispatch({ type: 'ADD_MISTAKE_TYPE', payload: mistakeType }),
     deleteMistakeType: (id) => dispatch({ type: 'DELETE_MISTAKE_TYPE', payload: id }),
+    addAsset: (asset) => dispatch({ type: 'ADD_ASSET', payload: asset }),
+    deleteAsset: (id) => dispatch({ type: 'DELETE_ASSET', payload: id }),
     resetDailyMetrics: () => dispatch({ type: 'RESET_DAILY_METRICS' }),
     hasDailyJournal,
     getDailyRiskStatus,

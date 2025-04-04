@@ -24,20 +24,22 @@ import {
 } from 'lucide-react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAppContext } from '@/context/AppContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 const AppLayout: React.FC = () => {
   const location = useLocation();
   const { hasDailyJournal, getDailyRiskStatus } = useAppContext();
+  const { t } = useLanguage();
 
   const menuItems = [
-    { title: 'Dashboard', path: '/', icon: Home },
-    { title: 'Daily Journal', path: '/journal', icon: BookText },
-    { title: 'Trades', path: '/trades', icon: TrendingUp },
-    { title: 'Analytics', path: '/analytics', icon: BarChart3 },
-    { title: 'Calendar', path: '/calendar', icon: Calendar },
-    { title: 'Settings', path: '/settings', icon: Settings }
+    { title: t('nav.dashboard'), path: '/', icon: Home },
+    { title: t('nav.journal'), path: '/journal', icon: BookText },
+    { title: t('nav.trades'), path: '/trades', icon: TrendingUp },
+    { title: t('nav.analytics'), path: '/analytics', icon: BarChart3 },
+    { title: t('nav.calendar'), path: '/calendar', icon: Calendar },
+    { title: t('nav.settings'), path: '/settings', icon: Settings }
   ];
 
   const riskStatus = getDailyRiskStatus();
@@ -69,7 +71,7 @@ const AppLayout: React.FC = () => {
                           <span>{item.title}</span>
                           
                           {item.path === '/journal' && !hasCompletedJournal && (
-                            <Badge className="ml-auto bg-yellow-500">Required</Badge>
+                            <Badge className="ml-auto bg-yellow-500">{t('common.required')}</Badge>
                           )}
                         </Link>
                       </SidebarMenuButton>
@@ -88,11 +90,11 @@ const AppLayout: React.FC = () => {
             )}>
               <AlertCircle size={18} className="mr-2" />
               <div>
-                <div className="text-sm font-medium">Risk Status</div>
+                <div className="text-sm font-medium">{t('risk.status')}</div>
                 <div className="text-xs">
-                  {riskStatus === 'safe' && "Within limits"}
-                  {riskStatus === 'warning' && "Approaching limit"}
-                  {riskStatus === 'danger' && "Exceeded limit"}
+                  {riskStatus === 'safe' && t('risk.within')}
+                  {riskStatus === 'warning' && t('risk.approaching')}
+                  {riskStatus === 'danger' && t('risk.exceeded')}
                 </div>
               </div>
             </div>
@@ -106,7 +108,7 @@ const AppLayout: React.FC = () => {
             </div>
             {!hasCompletedJournal && (
               <Badge className="ml-auto bg-yellow-500">
-                Complete daily journal
+                {t('journal.complete')}
               </Badge>
             )}
           </header>
