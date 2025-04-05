@@ -1,448 +1,203 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-type Language = 'en' | 'pt';
+// Define language types
+export type Language = "en-US" | "pt-BR";
 
-interface TranslationsType {
-  [key: string]: {
-    en: string;
-    pt: string;
-  };
-}
-
-// All translations for the application
-const translations: TranslationsType = {
-  // Common
-  'common.loading': {
-    en: 'Loading...',
-    pt: 'Carregando...'
-  },
-  'common.save': {
-    en: 'Save',
-    pt: 'Salvar'
-  },
-  'common.cancel': {
-    en: 'Cancel',
-    pt: 'Cancelar'
-  },
-  'common.delete': {
-    en: 'Delete',
-    pt: 'Excluir'
-  },
-  'common.edit': {
-    en: 'Edit',
-    pt: 'Editar'
-  },
-  'common.required': {
-    en: 'Required',
-    pt: 'Obrigatório'
-  },
-  
-  // Navigation
-  'nav.menu': {
-    en: 'Menu',
-    pt: 'Menu'
-  },
-  'nav.dashboard': {
-    en: 'Dashboard',
-    pt: 'Painel'
-  },
-  'nav.journal': {
-    en: 'Journal',
-    pt: 'Diário'
-  },
-  'nav.trades': {
-    en: 'Trades',
-    pt: 'Operações'
-  },
-  'nav.analytics': {
-    en: 'Analytics',
-    pt: 'Análises'
-  },
-  'nav.calendar': {
-    en: 'Calendar',
-    pt: 'Calendário'
-  },
-  'nav.settings': {
-    en: 'Settings',
-    pt: 'Configurações'
-  },
-  'nav.users': {
-    en: 'Users',
-    pt: 'Usuários'
-  },
-  
-  // Risk status
-  'risk.status': {
-    en: 'Risk Status',
-    pt: 'Status de Risco'
-  },
-  'risk.within': {
-    en: 'Within limits',
-    pt: 'Dentro dos limites'
-  },
-  'risk.approaching': {
-    en: 'Approaching limit',
-    pt: 'Próximo ao limite'
-  },
-  'risk.exceeded': {
-    en: 'Limit exceeded',
-    pt: 'Limite excedido'
-  },
-  
-  // Journal
-  'journal.complete': {
-    en: 'Complete daily journal',
-    pt: 'Complete o diário do dia'
-  },
-  'journal.title': {
-    en: 'Daily Journal',
-    pt: 'Diário de Operações'
-  },
-  'journal.date': {
-    en: 'Date',
-    pt: 'Data'
-  },
-  'journal.errorReview': {
-    en: 'Error Review Completed',
-    pt: 'Revisão de Erros Concluída'
-  },
-  'journal.dailyComment': {
-    en: 'Daily Comment',
-    pt: 'Comentário do Dia'
-  },
-  'journal.goalHit': {
-    en: 'Previous Day Goal Hit',
-    pt: 'Meta do Dia Anterior Atingida'
-  },
-  
-  // Trade
-  'trade.logTitle': {
-    en: 'Trade Log',
-    pt: 'Registro de Operações'
-  },
-  'trade.logDescription': {
-    en: 'Record and track all your trading activity',
-    pt: 'Registre e acompanhe todas as suas atividades de trading'
-  },
-  'trade.new': {
-    en: 'New Trade',
-    pt: 'Nova Operação'
-  },
-  'trade.asset': {
-    en: 'Asset',
-    pt: 'Ativo'
-  },
-  'trade.setup': {
-    en: 'Setup',
-    pt: 'Setup'
-  },
-  'trade.direction': {
-    en: 'Direction',
-    pt: 'Direção'
-  },
-  'trade.trendPosition': {
-    en: 'Trend Position',
-    pt: 'Posição na Tendência'
-  },
-  'trade.entryTime': {
-    en: 'Entry Time',
-    pt: 'Hora de Entrada'
-  },
-  'trade.exitTime': {
-    en: 'Exit Time',
-    pt: 'Hora de Saída'
-  },
-  'trade.result': {
-    en: 'Result',
-    pt: 'Resultado'
-  },
-  'trade.leverage': {
-    en: 'Leverage',
-    pt: 'Alavancagem'
-  },
-  'trade.notes': {
-    en: 'Notes',
-    pt: 'Notas'
-  },
-  'trade.mistake': {
-    en: 'Mistake?',
-    pt: 'Erro?'
-  },
-  'trade.mistakeType': {
-    en: 'Mistake Type',
-    pt: 'Tipo de Erro'
-  },
-  'trade.model': {
-    en: 'Model Trade',
-    pt: 'Operação Modelo'
-  },
-  'trade.searchAsset': {
-    en: 'Search assets...',
-    pt: 'Buscar ativos...'
-  },
-  'trade.noAssetsFound': {
-    en: 'No assets found',
-    pt: 'Nenhum ativo encontrado'
-  },
-  'trade.list': {
-    en: 'Trade List',
-    pt: 'Lista de Operações'
-  },
-  'trade.added': {
-    en: 'Trade added',
-    pt: 'Operação adicionada'
-  },
-  'trade.addedDescription': {
-    en: 'Your trade has been logged successfully.',
-    pt: 'Sua operação foi registrada com sucesso.'
-  },
-  'trade.updated': {
-    en: 'Trade updated',
-    pt: 'Operação atualizada'
-  },
-  'trade.updatedDescription': {
-    en: 'Your trade has been updated successfully.',
-    pt: 'Sua operação foi atualizada com sucesso.'
-  },
-  
-  // Calculator
-  'calculator.title': {
-    en: 'Leverage Calculator',
-    pt: 'Calculadora de Alavancagem'
-  },
-  'calculator.stopSize': {
-    en: 'Stop Size (%)',
-    pt: 'Tamanho do Stop (%)'
-  },
-  'calculator.riskAmount': {
-    en: 'Risk Amount ($)',
-    pt: 'Valor de Risco ($)'
-  },
-  'calculator.entryPrice': {
-    en: 'Entry Price ($)',
-    pt: 'Preço de Entrada ($)'
-  },
-  'calculator.calculate': {
-    en: 'Calculate',
-    pt: 'Calcular'
-  },
-  'calculator.maxLeverage': {
-    en: 'Maximum Leverage',
-    pt: 'Alavancagem Máxima'
-  },
-  'calculator.positionSize': {
-    en: 'Position Size',
-    pt: 'Tamanho da Posição'
-  },
-  'calculator.riskRatio': {
-    en: 'Risk:Reward Ratio',
-    pt: 'Relação Risco:Retorno'
-  },
-  
-  // Auth
-  'auth.loginTitle': {
-    en: 'Login to Trade Compass',
-    pt: 'Entrar no Trade Compass'
-  },
-  'auth.loginDescription': {
-    en: 'Enter your credentials to access your account',
-    pt: 'Digite suas credenciais para acessar sua conta'
-  },
-  'auth.email': {
-    en: 'Email',
-    pt: 'Email'
-  },
-  'auth.password': {
-    en: 'Password',
-    pt: 'Senha'
-  },
-  'auth.login': {
-    en: 'Log In',
-    pt: 'Entrar'
-  },
-  'auth.loginSuccess': {
-    en: 'Logged in successfully',
-    pt: 'Login realizado com sucesso'
-  },
-  'auth.loginError': {
-    en: 'Login failed',
-    pt: 'Falha no login'
-  },
-  'auth.demo': {
-    en: 'Demo credentials:',
-    pt: 'Credenciais de demonstração:'
-  },
-  
-  // Users
-  'users.title': {
-    en: 'User Management',
-    pt: 'Gerenciamento de Usuários'
-  },
-  'users.description': {
-    en: 'Manage user accounts and access permissions',
-    pt: 'Gerencie contas de usuários e permissões de acesso'
-  },
-  'users.new': {
-    en: 'New User',
-    pt: 'Novo Usuário'
-  },
-  'users.list': {
-    en: 'Users',
-    pt: 'Usuários'
-  },
-  'users.name': {
-    en: 'Name',
-    pt: 'Nome'
-  },
-  'users.email': {
-    en: 'Email',
-    pt: 'Email'
-  },
-  'users.role': {
-    en: 'Role',
-    pt: 'Função'
-  },
-  'users.mentor': {
-    en: 'Mentor',
-    pt: 'Mentor'
-  },
-  'users.mentored': {
-    en: 'Mentored',
-    pt: 'Mentorado'
-  },
-  'users.actions': {
-    en: 'Actions',
-    pt: 'Ações'
-  },
-  'users.noUsersFound': {
-    en: 'No users found',
-    pt: 'Nenhum usuário encontrado'
-  },
-  'users.updated': {
-    en: 'User updated successfully',
-    pt: 'Usuário atualizado com sucesso'
-  },
-  'users.added': {
-    en: 'User added successfully',
-    pt: 'Usuário adicionado com sucesso'
-  },
-  'users.deleted': {
-    en: 'User deleted successfully',
-    pt: 'Usuário excluído com sucesso'
-  },
-  'users.editUser': {
-    en: 'Edit User',
-    pt: 'Editar Usuário'
-  },
-  'users.addUser': {
-    en: 'Add User',
-    pt: 'Adicionar Usuário'
-  },
-  'users.saveChanges': {
-    en: 'Save Changes',
-    pt: 'Salvar Alterações'
-  },
-  'users.createUser': {
-    en: 'Create User',
-    pt: 'Criar Usuário'
-  },
-  'users.selectRole': {
-    en: 'Select a role',
-    pt: 'Selecione uma função'
-  },
-  'users.assignMentor': {
-    en: 'Assign Mentor',
-    pt: 'Atribuir Mentor'
-  },
-  'users.selectMentor': {
-    en: 'Select a mentor',
-    pt: 'Selecione um mentor'
-  },
-  'users.emailNote': {
-    en: 'This will be used for login',
-    pt: 'Isso será usado para login'
-  },
-  'users.cannotDeleteSelf': {
-    en: 'You cannot delete your own account',
-    pt: 'Você não pode excluir sua própria conta'
-  },
-  'users.search': {
-    en: 'Search users...',
-    pt: 'Buscar usuários...'
-  },
-  'users.filterByRole': {
-    en: 'Filter by role',
-    pt: 'Filtrar por função'
-  },
-  'users.allRoles': {
-    en: 'All roles',
-    pt: 'Todas as funções'
-  },
-  'users.accessDenied': {
-    en: 'Access denied. Only mentors can access this page.',
-    pt: 'Acesso negado. Apenas mentores podem acessar esta página.'
-  }
-};
-
-// Context type
+// Define the context type
 type LanguageContextType = {
-  t: (key: string) => string;
   currentLanguage: Language;
   setLanguage: (language: Language) => void;
+  t: (key: string) => string;
 };
 
 // Create the context
-const LanguageContext = createContext<LanguageContextType | null>(null);
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Try to get language from localStorage or use browser language
-  const getBrowserLanguage = (): Language => {
-    const browserLang = navigator.language.substring(0, 2);
-    return browserLang === 'pt' ? 'pt' : 'en';
-  };
-  
-  const getInitialLanguage = (): Language => {
-    const savedLang = localStorage.getItem('language');
-    return (savedLang === 'en' || savedLang === 'pt') 
-      ? savedLang 
-      : getBrowserLanguage();
-  };
-  
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(getInitialLanguage());
-  
-  // Save language preference to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem('language', currentLanguage);
-  }, [currentLanguage]);
-  
-  // Translation function
+// Set up translations
+const translations: Record<Language, Record<string, string>> = {
+  "en-US": {
+    "app.title": "MyTradingMind",
+    "nav.dashboard": "Dashboard",
+    "nav.journal": "Journal",
+    "nav.trades": "Trades",
+    "nav.analytics": "Analytics",
+    "nav.calendar": "Calendar",
+    "nav.settings": "Settings",
+    "nav.users": "Users",
+    "nav.menu": "Menu",
+    
+    "common.required": "Required",
+    "common.add": "Added successfully",
+    "common.cancel": "Cancel",
+    "common.delete": "Delete",
+    "common.save": "Save",
+    
+    "risk.status": "Risk Status",
+    "risk.within": "Within limit",
+    "risk.approaching": "Approaching limit",
+    "risk.exceeded": "Limit exceeded",
+    
+    "journal.complete": "Complete daily journal",
+    
+    "settings.language": "Language",
+    "settings.riskManagement": "Risk Management",
+    "settings.tradingSetups": "Trading Setups",
+    "settings.mistakeTypes": "Mistake Types",
+    "settings.assets": "Assets",
+    "settings.newSetup": "New Setup",
+    "settings.addSetup": "Add Setup",
+    "settings.newMistakeType": "New Mistake Type",
+    "settings.addMistakeType": "Add Mistake Type",
+    "settings.newAsset": "New Asset",
+    "settings.addAsset": "Add Asset",
+    
+    "trade.logTitle": "Trade Log",
+    "trade.logDescription": "Record and track all your trading activity",
+    "trade.new": "New Trade",
+    "trade.list": "Trade List",
+    "trade.added": "Trade Added",
+    "trade.addedDescription": "Your trade has been recorded successfully.",
+    "trade.updated": "Trade Updated",
+    "trade.updatedDescription": "Your trade has been updated successfully.",
+    "trade.againstTrend": "Against Trend",
+    "trade.financialResult": "Financial Result",
+    "trade.profitLoss": "Profit/Loss",
+    "trade.mistakeDescription": "Mistake Description",
+    "trade.modelTrade": "Model Trade",
+    "trade.modelDescription": "Model Description",
+    
+    "calculator.title": "Leverage Calculator",
+    
+    "analytics.title": "Analytics",
+    
+    "users.title": "User Management",
+    "users.description": "Manage mentored traders and other mentors",
+    "users.new": "New User",
+    "users.list": "User List",
+    "users.search": "Search by name or email",
+    "users.filterByRole": "Filter by role",
+    "users.allRoles": "All roles",
+    "users.mentor": "Mentor",
+    "users.mentored": "Mentored",
+    "users.name": "Name",
+    "users.email": "Email",
+    "users.role": "Role",
+    "users.mentor": "Mentor",
+    "users.actions": "Actions",
+    "users.updated": "User Updated",
+    "users.added": "User Added",
+    "users.deleted": "User Deleted",
+    "users.cannotDeleteSelf": "You cannot delete your own account",
+    "users.noUsersFound": "No users found",
+    "users.accessDenied": "Access denied. Only mentors can view this page."
+  },
+  "pt-BR": {
+    "app.title": "MyTradingMind",
+    "nav.dashboard": "Painel",
+    "nav.journal": "Diário",
+    "nav.trades": "Operações",
+    "nav.analytics": "Análises",
+    "nav.calendar": "Calendário",
+    "nav.settings": "Configurações",
+    "nav.users": "Usuários",
+    "nav.menu": "Menu",
+    
+    "common.required": "Obrigatório",
+    "common.add": "Adicionado com sucesso",
+    "common.cancel": "Cancelar",
+    "common.delete": "Excluir",
+    "common.save": "Salvar",
+    
+    "risk.status": "Status de Risco",
+    "risk.within": "Dentro do limite",
+    "risk.approaching": "Próximo ao limite",
+    "risk.exceeded": "Limite excedido",
+    
+    "journal.complete": "Complete o diário diário",
+    
+    "settings.language": "Idioma",
+    "settings.riskManagement": "Gestão de Risco",
+    "settings.tradingSetups": "Setups de Trading",
+    "settings.mistakeTypes": "Tipos de Erros",
+    "settings.assets": "Ativos",
+    "settings.newSetup": "Novo Setup",
+    "settings.addSetup": "Adicionar Setup",
+    "settings.newMistakeType": "Novo Tipo de Erro",
+    "settings.addMistakeType": "Adicionar Tipo de Erro",
+    "settings.newAsset": "Novo Ativo",
+    "settings.addAsset": "Adicionar Ativo",
+    
+    "trade.logTitle": "Registro de Operações",
+    "trade.logDescription": "Registre e acompanhe todas as suas atividades de trading",
+    "trade.new": "Nova Operação",
+    "trade.list": "Lista de Operações",
+    "trade.added": "Operação Adicionada",
+    "trade.addedDescription": "Sua operação foi registrada com sucesso.",
+    "trade.updated": "Operação Atualizada",
+    "trade.updatedDescription": "Sua operação foi atualizada com sucesso.",
+    "trade.againstTrend": "Contra Tendência",
+    "trade.financialResult": "Resultado Financeiro",
+    "trade.profitLoss": "Lucro/Prejuízo",
+    "trade.mistakeDescription": "Descrição do Erro",
+    "trade.modelTrade": "Operação Modelo",
+    "trade.modelDescription": "Descrição do Modelo",
+    
+    "calculator.title": "Calculadora de Alavancagem",
+    
+    "analytics.title": "Análises",
+    
+    "users.title": "Gerenciamento de Usuários",
+    "users.description": "Gerencie traders mentorados e outros mentores",
+    "users.new": "Novo Usuário",
+    "users.list": "Lista de Usuários",
+    "users.search": "Buscar por nome ou email",
+    "users.filterByRole": "Filtrar por função",
+    "users.allRoles": "Todas as funções",
+    "users.mentor": "Mentor",
+    "users.mentored": "Mentorado",
+    "users.name": "Nome",
+    "users.email": "Email",
+    "users.role": "Função",
+    "users.mentor": "Mentor",
+    "users.actions": "Ações",
+    "users.updated": "Usuário Atualizado",
+    "users.added": "Usuário Adicionado",
+    "users.deleted": "Usuário Excluído",
+    "users.cannotDeleteSelf": "Você não pode excluir sua própria conta",
+    "users.noUsersFound": "Nenhum usuário encontrado",
+    "users.accessDenied": "Acesso negado. Apenas mentores podem visualizar esta página."
+  }
+};
+
+// Provider component
+export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [currentLanguage, setCurrentLanguage] = useState<Language>("en-US");
+
+  // Function to get translations
   const t = (key: string): string => {
-    const translation = translations[key];
-    
-    if (!translation) {
-      console.warn(`Translation missing for key: ${key}`);
-      return key;
-    }
-    
-    return translation[currentLanguage] || key;
+    return translations[currentLanguage][key] || key;
   };
-  
+
+  // Function to change language
+  const setLanguage = (language: Language) => {
+    setCurrentLanguage(language);
+  };
+
   return (
-    <LanguageContext.Provider value={{
-      t,
-      currentLanguage,
-      setLanguage: setCurrentLanguage
-    }}>
+    <LanguageContext.Provider value={{ currentLanguage, setLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );
 };
 
+// Custom hook to use the language context
 export const useLanguage = (): LanguageContextType => {
   const context = useContext(LanguageContext);
-  if (!context) {
+  
+  if (context === undefined) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
+  
   return context;
 };

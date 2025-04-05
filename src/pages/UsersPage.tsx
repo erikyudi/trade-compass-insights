@@ -11,7 +11,7 @@ import { Plus, Pencil, Trash, Search, ExternalLink } from 'lucide-react';
 import { User, UserRole } from '@/types';
 import { toast } from 'sonner';
 import UserForm from '@/components/users/UserForm';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { Link } from 'react-router-dom';
 
 // Mock users data - in a real app this would come from an API
@@ -113,11 +113,11 @@ const UsersPage: React.FC = () => {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t('users.title')}</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-100">{t('users.title')}</h1>
           <p className="text-muted-foreground">{t('users.description')}</p>
         </div>
         {!isAddingUser && !editingUser && (
-          <Button onClick={() => setIsAddingUser(true)}>
+          <Button onClick={() => setIsAddingUser(true)} className="bg-orange-500 hover:bg-orange-600">
             <Plus className="mr-2 h-4 w-4" />
             {t('users.new')}
           </Button>
@@ -135,9 +135,9 @@ const UsersPage: React.FC = () => {
           }}
         />
       ) : (
-        <Card>
+        <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
-            <CardTitle>{t('users.list')}</CardTitle>
+            <CardTitle className="text-gray-100">{t('users.list')}</CardTitle>
             <div className="flex flex-col md:flex-row gap-4 mt-4">
               <div className="relative flex-1">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -145,17 +145,17 @@ const UsersPage: React.FC = () => {
                   placeholder={t('users.search')}
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
-                  className="pl-8"
+                  className="pl-8 bg-gray-700 border-gray-600"
                 />
               </div>
               <Select
                 value={roleFilter}
                 onValueChange={setRoleFilter}
               >
-                <SelectTrigger className="w-48">
+                <SelectTrigger className="w-48 bg-gray-700 border-gray-600">
                   <SelectValue placeholder={t('users.filterByRole')} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-gray-800 border-gray-700">
                   <SelectItem value="all">{t('users.allRoles')}</SelectItem>
                   <SelectItem value="mentor">{t('users.mentor')}</SelectItem>
                   <SelectItem value="mentored">{t('users.mentored')}</SelectItem>
@@ -165,31 +165,31 @@ const UsersPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             <Table>
-              <TableHeader>
+              <TableHeader className="bg-gray-900">
                 <TableRow>
-                  <TableHead>{t('users.name')}</TableHead>
-                  <TableHead>{t('users.email')}</TableHead>
-                  <TableHead>{t('users.role')}</TableHead>
-                  <TableHead>{t('users.mentor')}</TableHead>
-                  <TableHead>{t('users.actions')}</TableHead>
+                  <TableHead className="text-gray-300">{t('users.name')}</TableHead>
+                  <TableHead className="text-gray-300">{t('users.email')}</TableHead>
+                  <TableHead className="text-gray-300">{t('users.role')}</TableHead>
+                  <TableHead className="text-gray-300">{t('users.mentor')}</TableHead>
+                  <TableHead className="text-gray-300">{t('users.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredUsers.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-6">
+                    <TableCell colSpan={5} className="text-center py-6 text-gray-400">
                       {t('users.noUsersFound')}
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredUsers.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.name}</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>
+                    <TableRow key={user.id} className="border-gray-700">
+                      <TableCell className="font-medium text-gray-300">{user.name}</TableCell>
+                      <TableCell className="text-gray-300">{user.email}</TableCell>
+                      <TableCell className="text-gray-300">
                         {user.role === 'mentor' ? t('users.mentor') : t('users.mentored')}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-gray-300">
                         {user.mentorId ? 
                           users.find(u => u.id === user.mentorId)?.name || '-' : 
                           '-'}
@@ -200,24 +200,27 @@ const UsersPage: React.FC = () => {
                             variant="outline" 
                             size="sm" 
                             onClick={() => setEditingUser(user)}
+                            className="border-gray-600 hover:bg-gray-700"
                           >
-                            <Pencil className="h-4 w-4" />
+                            <Pencil className="h-4 w-4 text-orange-400" />
                           </Button>
                           <Button 
                             variant="outline" 
                             size="sm" 
                             onClick={() => handleDeleteUser(user.id)}
+                            className="border-gray-600 hover:bg-gray-700"
                           >
-                            <Trash className="h-4 w-4" />
+                            <Trash className="h-4 w-4 text-red-400" />
                           </Button>
                           {user.role === 'mentored' && (
                             <Button
                               variant="outline"
                               size="sm"
                               asChild
+                              className="border-gray-600 hover:bg-gray-700"
                             >
                               <Link to={`/user-stats/${user.id}`}>
-                                <ExternalLink className="h-4 w-4" />
+                                <ExternalLink className="h-4 w-4 text-blue-400" />
                               </Link>
                             </Button>
                           )}

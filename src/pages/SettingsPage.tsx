@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useLanguage } from '@/context/LanguageContext';
@@ -120,31 +119,34 @@ const SettingsPage: React.FC = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t('nav.settings')}</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-100">{t('nav.settings')}</h1>
         <p className="text-muted-foreground">
           Manage your trading parameters and preferences
         </p>
       </div>
       
-      <Tabs defaultValue="language">
-        <TabsList>
-          <TabsTrigger value="language">{t('settings.language')}</TabsTrigger>
-          <TabsTrigger value="risk">{t('settings.riskManagement')}</TabsTrigger>
-          <TabsTrigger value="setups">{t('settings.tradingSetups')}</TabsTrigger>
-          <TabsTrigger value="mistakes">{t('settings.mistakeTypes')}</TabsTrigger>
-          <TabsTrigger value="assets">{t('settings.assets')}</TabsTrigger>
+      <Tabs defaultValue="language" className="w-full">
+        <TabsList className="bg-gray-800">
+          <TabsTrigger value="language" className="data-[state=active]:bg-orange-500">{t('settings.language')}</TabsTrigger>
+          <TabsTrigger value="risk" className="data-[state=active]:bg-orange-500">{t('settings.riskManagement')}</TabsTrigger>
+          <TabsTrigger value="setups" className="data-[state=active]:bg-orange-500">{t('settings.tradingSetups')}</TabsTrigger>
+          <TabsTrigger value="mistakes" className="data-[state=active]:bg-orange-500">{t('settings.mistakeTypes')}</TabsTrigger>
+          <TabsTrigger value="assets" className="data-[state=active]:bg-orange-500">{t('settings.assets')}</TabsTrigger>
         </TabsList>
         
         <TabsContent value="language" className="space-y-6">
-          <Card>
+          <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
-              <CardTitle>{t('settings.language')}</CardTitle>
+              <CardTitle className="text-gray-100">{t('settings.language')}</CardTitle>
               <CardDescription>
                 Choose your preferred language
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <RadioGroup defaultValue={language} onValueChange={(value) => setLanguage(value as 'en-US' | 'pt-BR')}>
+              <RadioGroup 
+                defaultValue={language} 
+                onValueChange={(value) => setLanguage(value as "en-US" | "pt-BR")}
+              >
                 <div className="flex items-center space-x-2 mb-2">
                   <RadioGroupItem value="en-US" id="en-US" />
                   <Label htmlFor="en-US">English (US)</Label>
@@ -161,9 +163,9 @@ const SettingsPage: React.FC = () => {
         <TabsContent value="risk" className="space-y-6">
           <RiskSettingsForm />
           
-          <Card>
+          <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
-              <CardTitle>About Risk Management</CardTitle>
+              <CardTitle className="text-gray-100">About Risk Management</CardTitle>
               <CardDescription>
                 Understanding your risk parameters
               </CardDescription>
@@ -171,21 +173,21 @@ const SettingsPage: React.FC = () => {
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-medium">Initial Capital</h3>
+                  <h3 className="font-medium text-gray-100">Initial Capital</h3>
                   <p className="text-sm text-muted-foreground">
                     The starting amount in your trading account. This is used as the basis for calculating percentage-based profit targets and risk limits.
                   </p>
                 </div>
                 
                 <div>
-                  <h3 className="font-medium">Daily Profit Target</h3>
+                  <h3 className="font-medium text-gray-100">Daily Profit Target</h3>
                   <p className="text-sm text-muted-foreground">
                     Your target profit for each trading day, expressed as a percentage of your initial capital. Setting realistic targets helps maintain discipline.
                   </p>
                 </div>
                 
                 <div>
-                  <h3 className="font-medium">Maximum Daily Risk</h3>
+                  <h3 className="font-medium text-gray-100">Maximum Daily Risk</h3>
                   <p className="text-sm text-muted-foreground">
                     The maximum percentage of your capital you're willing to risk in a single day. When this limit is reached, the system will alert you to stop trading for the day.
                   </p>
@@ -196,9 +198,9 @@ const SettingsPage: React.FC = () => {
         </TabsContent>
         
         <TabsContent value="setups">
-          <Card>
+          <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
-              <CardTitle>{t('settings.tradingSetups')}</CardTitle>
+              <CardTitle className="text-gray-100">{t('settings.tradingSetups')}</CardTitle>
               <CardDescription>
                 Manage the setups you use in your trading strategy
               </CardDescription>
@@ -207,44 +209,46 @@ const SettingsPage: React.FC = () => {
               <div className="mb-6">
                 <div className="flex items-end gap-4">
                   <div className="space-y-2 flex-1">
-                    <label className="text-sm font-medium">{t('settings.newSetup')}</label>
+                    <label className="text-sm font-medium text-gray-200">{t('settings.newSetup')}</label>
                     <Input 
                       placeholder="Enter setup name" 
                       value={newSetupName}
                       onChange={(e) => setNewSetupName(e.target.value)}
+                      className="bg-gray-700 border-gray-600"
                     />
                   </div>
-                  <Button onClick={handleAddSetup}>
+                  <Button onClick={handleAddSetup} className="bg-orange-500 hover:bg-orange-600">
                     <Plus className="mr-2 h-4 w-4" />
                     {t('settings.addSetup')}
                   </Button>
                 </div>
               </div>
               
-              <div className="rounded-md border">
+              <div className="rounded-md border border-gray-700">
                 <Table>
-                  <TableHeader>
+                  <TableHeader className="bg-gray-900">
                     <TableRow>
-                      <TableHead>Setup Name</TableHead>
-                      <TableHead className="w-[100px] text-right">Actions</TableHead>
+                      <TableHead className="text-gray-300">Setup Name</TableHead>
+                      <TableHead className="w-[100px] text-right text-gray-300">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {state.setups.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={2} className="text-center">
+                        <TableCell colSpan={2} className="text-center text-gray-400">
                           No setups defined.
                         </TableCell>
                       </TableRow>
                     ) : (
                       state.setups.map((setup) => (
-                        <TableRow key={setup.id}>
-                          <TableCell className="font-medium">{setup.name}</TableCell>
+                        <TableRow key={setup.id} className="border-gray-700">
+                          <TableCell className="font-medium text-gray-300">{setup.name}</TableCell>
                           <TableCell className="text-right">
                             <Button 
                               variant="ghost" 
                               size="sm"
                               onClick={() => setDeletingSetupId(setup.id)}
+                              className="text-gray-300 hover:text-red-400"
                             >
                               <Trash className="h-4 w-4" />
                             </Button>
@@ -260,9 +264,9 @@ const SettingsPage: React.FC = () => {
         </TabsContent>
         
         <TabsContent value="mistakes">
-          <Card>
+          <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
-              <CardTitle>{t('settings.mistakeTypes')}</CardTitle>
+              <CardTitle className="text-gray-100">{t('settings.mistakeTypes')}</CardTitle>
               <CardDescription>
                 Categorize trading mistakes to learn from them
               </CardDescription>
@@ -271,44 +275,46 @@ const SettingsPage: React.FC = () => {
               <div className="mb-6">
                 <div className="flex items-end gap-4">
                   <div className="space-y-2 flex-1">
-                    <label className="text-sm font-medium">{t('settings.newMistakeType')}</label>
+                    <label className="text-sm font-medium text-gray-200">{t('settings.newMistakeType')}</label>
                     <Input 
                       placeholder="Enter mistake type" 
                       value={newMistakeTypeName}
                       onChange={(e) => setNewMistakeTypeName(e.target.value)}
+                      className="bg-gray-700 border-gray-600"
                     />
                   </div>
-                  <Button onClick={handleAddMistakeType}>
+                  <Button onClick={handleAddMistakeType} className="bg-orange-500 hover:bg-orange-600">
                     <Plus className="mr-2 h-4 w-4" />
                     {t('settings.addMistakeType')}
                   </Button>
                 </div>
               </div>
               
-              <div className="rounded-md border">
+              <div className="rounded-md border border-gray-700">
                 <Table>
-                  <TableHeader>
+                  <TableHeader className="bg-gray-900">
                     <TableRow>
-                      <TableHead>Mistake Type</TableHead>
-                      <TableHead className="w-[100px] text-right">Actions</TableHead>
+                      <TableHead className="text-gray-300">Mistake Type</TableHead>
+                      <TableHead className="w-[100px] text-right text-gray-300">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {state.mistakeTypes.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={2} className="text-center">
+                        <TableCell colSpan={2} className="text-center text-gray-400">
                           No mistake types defined.
                         </TableCell>
                       </TableRow>
                     ) : (
                       state.mistakeTypes.map((type) => (
-                        <TableRow key={type.id}>
-                          <TableCell className="font-medium">{type.name}</TableCell>
+                        <TableRow key={type.id} className="border-gray-700">
+                          <TableCell className="font-medium text-gray-300">{type.name}</TableCell>
                           <TableCell className="text-right">
                             <Button 
                               variant="ghost" 
                               size="sm"
                               onClick={() => setDeletingMistakeTypeId(type.id)}
+                              className="text-gray-300 hover:text-red-400"
                             >
                               <Trash className="h-4 w-4" />
                             </Button>
@@ -324,9 +330,9 @@ const SettingsPage: React.FC = () => {
         </TabsContent>
         
         <TabsContent value="assets">
-          <Card>
+          <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
-              <CardTitle>{t('settings.assets')}</CardTitle>
+              <CardTitle className="text-gray-100">{t('settings.assets')}</CardTitle>
               <CardDescription>
                 Manage the assets you trade
               </CardDescription>
@@ -335,44 +341,46 @@ const SettingsPage: React.FC = () => {
               <div className="mb-6">
                 <div className="flex items-end gap-4">
                   <div className="space-y-2 flex-1">
-                    <label className="text-sm font-medium">{t('settings.newAsset')}</label>
+                    <label className="text-sm font-medium text-gray-200">{t('settings.newAsset')}</label>
                     <Input 
                       placeholder="e.g., EURUSD, AAPL, BTC" 
                       value={newAssetSymbol}
                       onChange={(e) => setNewAssetSymbol(e.target.value)}
+                      className="bg-gray-700 border-gray-600"
                     />
                   </div>
-                  <Button onClick={handleAddAsset}>
+                  <Button onClick={handleAddAsset} className="bg-orange-500 hover:bg-orange-600">
                     <Plus className="mr-2 h-4 w-4" />
                     {t('settings.addAsset')}
                   </Button>
                 </div>
               </div>
               
-              <div className="rounded-md border">
+              <div className="rounded-md border border-gray-700">
                 <Table>
-                  <TableHeader>
+                  <TableHeader className="bg-gray-900">
                     <TableRow>
-                      <TableHead>Asset Symbol</TableHead>
-                      <TableHead className="w-[100px] text-right">Actions</TableHead>
+                      <TableHead className="text-gray-300">Asset Symbol</TableHead>
+                      <TableHead className="w-[100px] text-right text-gray-300">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {state.assets.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={2} className="text-center">
+                        <TableCell colSpan={2} className="text-center text-gray-400">
                           No assets defined.
                         </TableCell>
                       </TableRow>
                     ) : (
                       state.assets.map((asset) => (
-                        <TableRow key={asset.id}>
-                          <TableCell className="font-medium">{asset.symbol}</TableCell>
+                        <TableRow key={asset.id} className="border-gray-700">
+                          <TableCell className="font-medium text-gray-300">{asset.symbol}</TableCell>
                           <TableCell className="text-right">
                             <Button 
                               variant="ghost" 
                               size="sm"
                               onClick={() => setDeletingAssetId(asset.id)}
+                              className="text-gray-300 hover:text-red-400"
                             >
                               <Trash className="h-4 w-4" />
                             </Button>
@@ -393,17 +401,17 @@ const SettingsPage: React.FC = () => {
         open={!!deletingSetupId} 
         onOpenChange={(open) => !open && setDeletingSetupId(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-gray-800 border-gray-700">
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-gray-100">Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-300">
               This action cannot be undone. This will permanently delete this trading setup.
               Any trades using this setup will still remain in your history.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteSetup} className="bg-red-600">
+            <AlertDialogCancel className="text-gray-300">{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteSetup} className="bg-red-600 text-gray-50">
               {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -415,17 +423,17 @@ const SettingsPage: React.FC = () => {
         open={!!deletingMistakeTypeId} 
         onOpenChange={(open) => !open && setDeletingMistakeTypeId(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-gray-800 border-gray-700">
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-gray-100">Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-300">
               This action cannot be undone. This will permanently delete this mistake type.
               Any trades using this mistake type will still remain in your history.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteMistakeType} className="bg-red-600">
+            <AlertDialogCancel className="text-gray-300">{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteMistakeType} className="bg-red-600 text-gray-50">
               {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -437,17 +445,17 @@ const SettingsPage: React.FC = () => {
         open={!!deletingAssetId} 
         onOpenChange={(open) => !open && setDeletingAssetId(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-gray-800 border-gray-700">
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-gray-100">Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-300">
               This action cannot be undone. This will permanently delete this asset.
               Any trades using this asset will still remain in your history.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteAsset} className="bg-red-600">
+            <AlertDialogCancel className="text-gray-300">{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteAsset} className="bg-red-600 text-gray-50">
               {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
