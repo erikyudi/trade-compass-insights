@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { Check, ChevronsUpDown, Search } from 'lucide-react';
@@ -35,7 +35,8 @@ const SearchableAssetSelect: React.FC<SearchableAssetSelectProps> = ({
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
 
-  const assets = state.assets;
+  // Make sure assets is always an array, even if it's undefined
+  const assets = state.assets || [];
 
   // Handle the selection of an asset
   const handleSelect = (currentValue: string) => {
