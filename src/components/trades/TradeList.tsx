@@ -32,6 +32,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useLanguage } from '@/context/LanguageContext';
+import { formatCurrency } from '@/context/appUtils';
 
 type TradeListProps = {
   onEdit: (trade: Trade) => void;
@@ -39,6 +41,7 @@ type TradeListProps = {
 
 const TradeList: React.FC<TradeListProps> = ({ onEdit }) => {
   const { state, deleteTrade } = useAppContext();
+  const { t } = useLanguage();
   const { trades, setups, mistakeTypes } = state;
   
   const [selectedTradeId, setSelectedTradeId] = useState<string | null>(null);
@@ -89,18 +92,10 @@ const TradeList: React.FC<TradeListProps> = ({ onEdit }) => {
     return mistakeTypes.find(type => type.id === id)?.name || 'Unknown';
   };
   
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-    }).format(value);
-  };
-  
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Trade History</CardTitle>
+        <CardTitle>{t('analytics.title')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="rounded-md border">
@@ -114,7 +109,7 @@ const TradeList: React.FC<TradeListProps> = ({ onEdit }) => {
                     onClick={() => handleSort('asset')}
                     className="font-medium"
                   >
-                    Asset
+                    {t('trade.asset')}
                     {sortField === 'asset' && (
                       sortDirection === 'asc' ? <ArrowUp className="ml-1 h-4 w-4 inline" /> : <ArrowDown className="ml-1 h-4 w-4 inline" />
                     )}
@@ -127,13 +122,13 @@ const TradeList: React.FC<TradeListProps> = ({ onEdit }) => {
                     onClick={() => handleSort('setupId')}
                     className="font-medium"
                   >
-                    Setup
+                    {t('trade.setup')}
                     {sortField === 'setupId' && (
                       sortDirection === 'asc' ? <ArrowUp className="ml-1 h-4 w-4 inline" /> : <ArrowDown className="ml-1 h-4 w-4 inline" />
                     )}
                   </Button>
                 </TableHead>
-                <TableHead>Direction</TableHead>
+                <TableHead>{t('trade.direction')}</TableHead>
                 <TableHead>
                   <Button 
                     variant="ghost" 
@@ -141,7 +136,7 @@ const TradeList: React.FC<TradeListProps> = ({ onEdit }) => {
                     onClick={() => handleSort('entryTime')}
                     className="font-medium"
                   >
-                    Entry Time
+                    {t('trade.entryTime')}
                     {sortField === 'entryTime' && (
                       sortDirection === 'asc' ? <ArrowUp className="ml-1 h-4 w-4 inline" /> : <ArrowDown className="ml-1 h-4 w-4 inline" />
                     )}
@@ -160,7 +155,7 @@ const TradeList: React.FC<TradeListProps> = ({ onEdit }) => {
                     )}
                   </Button>
                 </TableHead>
-                <TableHead>Risk/Reward</TableHead>
+                <TableHead>{t('trade.leverage')}</TableHead>
                 <TableHead>Tags</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -197,7 +192,7 @@ const TradeList: React.FC<TradeListProps> = ({ onEdit }) => {
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell>{trade.riskRewardRatio}</TableCell>
+                    <TableCell>{trade.leverage}x</TableCell>
                     <TableCell>
                       <div className="flex gap-1 flex-wrap">
                         {trade.isModelTrade && (
@@ -226,14 +221,14 @@ const TradeList: React.FC<TradeListProps> = ({ onEdit }) => {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => onEdit(trade)}>
                             <Edit className="mr-2 h-4 w-4" />
-                            Edit
+                            {t('common.edit')}
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             onClick={() => setSelectedTradeId(trade.id)}
                             className="text-red-600"
                           >
                             <Trash className="mr-2 h-4 w-4" />
-                            Delete
+                            {t('common.delete')}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -254,9 +249,9 @@ const TradeList: React.FC<TradeListProps> = ({ onEdit }) => {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
               <AlertDialogAction onClick={handleDelete} className="bg-red-600">
-                Delete
+                {t('common.delete')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

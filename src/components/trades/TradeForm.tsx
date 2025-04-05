@@ -40,6 +40,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Trade } from '@/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import SearchableAssetSelect from './SearchableAssetSelect';
 
 const formSchema = z.object({
   asset: z.string().min(1, { message: 'Asset symbol is required' }),
@@ -83,7 +84,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
 }) => {
   const { state, hasDailyJournal, checkRiskLimit } = useAppContext();
   const { t } = useLanguage();
-  const { setups, mistakeTypes, assets } = state;
+  const { setups, mistakeTypes } = state;
   
   const defaultValues = trade ? {
     ...trade,
@@ -147,30 +148,18 @@ const TradeForm: React.FC<TradeFormProps> = ({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Asset */}
+              {/* Asset - Replace with SearchableAssetSelect */}
               <FormField
                 control={form.control}
                 name="asset"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t('trade.asset')}</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select asset" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {assets.map((asset) => (
-                          <SelectItem key={asset.id} value={asset.symbol}>
-                            {asset.symbol}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <SearchableAssetSelect
+                      value={field.value}
+                      onChange={field.onChange}
+                      disabled={field.disabled}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -376,7 +365,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                         step="0.01"
                         placeholder="0.00"
                         {...field}
-                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -397,7 +386,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                         step="0.01"
                         placeholder="0.00"
                         {...field} 
-                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -419,7 +408,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                         min="1"
                         placeholder="1"
                         {...field} 
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
                       />
                     </FormControl>
                     <FormMessage />

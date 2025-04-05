@@ -36,6 +36,22 @@ const translations: TranslationsType = {
     'en-US': 'Settings',
     'pt-BR': 'Configurações',
   },
+  'nav.users': {
+    'en-US': 'Users',
+    'pt-BR': 'Usuários',
+  },
+  'nav.calculator': {
+    'en-US': 'Leverage Calculator',
+    'pt-BR': 'Calculadora de Alavancagem',
+  },
+  'nav.login': {
+    'en-US': 'Login',
+    'pt-BR': 'Entrar',
+  },
+  'nav.logout': {
+    'en-US': 'Logout',
+    'pt-BR': 'Sair',
+  },
 
   // Common
   'common.required': {
@@ -61,6 +77,22 @@ const translations: TranslationsType = {
   'common.edit': {
     'en-US': 'Edit',
     'pt-BR': 'Editar',
+  },
+  'common.search': {
+    'en-US': 'Search',
+    'pt-BR': 'Buscar',
+  },
+  'common.filter': {
+    'en-US': 'Filter',
+    'pt-BR': 'Filtrar',
+  },
+  'common.create': {
+    'en-US': 'Create',
+    'pt-BR': 'Criar',
+  },
+  'common.close': {
+    'en-US': 'Close',
+    'pt-BR': 'Fechar',
   },
 
   // Risk Status
@@ -103,6 +135,14 @@ const translations: TranslationsType = {
   'trade.asset': {
     'en-US': 'Asset',
     'pt-BR': 'Ativo',
+  },
+  'trade.searchAsset': {
+    'en-US': 'Search assets...',
+    'pt-BR': 'Buscar ativos...',
+  },
+  'trade.noAssetsFound': {
+    'en-US': 'No assets found',
+    'pt-BR': 'Nenhum ativo encontrado',
   },
   'trade.setup': {
     'en-US': 'Setup',
@@ -267,6 +307,120 @@ const translations: TranslationsType = {
   'analytics.reset': {
     'en-US': 'Reset',
     'pt-BR': 'Resetar',
+  },
+
+  // Calculator
+  'calculator.title': {
+    'en-US': 'Leverage Calculator',
+    'pt-BR': 'Calculadora de Alavancagem',
+  },
+  'calculator.description': {
+    'en-US': 'Calculate the maximum leverage for your trade',
+    'pt-BR': 'Calcule a alavancagem máxima para sua operação',
+  },
+  'calculator.stopSize': {
+    'en-US': 'Stop Size (%)',
+    'pt-BR': 'Tamanho do Stop (%)',
+  },
+  'calculator.riskAmount': {
+    'en-US': 'Risk Amount ($)',
+    'pt-BR': 'Valor de Risco ($)',
+  },
+  'calculator.entryPrice': {
+    'en-US': 'Entry Price ($)',
+    'pt-BR': 'Preço de Entrada ($)',
+  },
+  'calculator.calculate': {
+    'en-US': 'Calculate',
+    'pt-BR': 'Calcular',
+  },
+  'calculator.maxLeverage': {
+    'en-US': 'Maximum Leverage',
+    'pt-BR': 'Alavancagem Máxima',
+  },
+  'calculator.positionSize': {
+    'en-US': 'Position Size',
+    'pt-BR': 'Tamanho da Posição',
+  },
+
+  // User Management
+  'users.title': {
+    'en-US': 'User Management',
+    'pt-BR': 'Gerenciamento de Usuários',
+  },
+  'users.description': {
+    'en-US': 'Manage all users of the platform',
+    'pt-BR': 'Gerencie todos os usuários da plataforma',
+  },
+  'users.list': {
+    'en-US': 'User List',
+    'pt-BR': 'Lista de Usuários',
+  },
+  'users.create': {
+    'en-US': 'Create User',
+    'pt-BR': 'Criar Usuário',
+  },
+  'users.name': {
+    'en-US': 'Name',
+    'pt-BR': 'Nome',
+  },
+  'users.email': {
+    'en-US': 'Email',
+    'pt-BR': 'Email',
+  },
+  'users.role': {
+    'en-US': 'Role',
+    'pt-BR': 'Papel',
+  },
+  'users.mentor': {
+    'en-US': 'Mentor',
+    'pt-BR': 'Mentor',
+  },
+  'users.mentored': {
+    'en-US': 'Mentored',
+    'pt-BR': 'Mentorado',
+  },
+  'users.assignMentor': {
+    'en-US': 'Assign Mentor',
+    'pt-BR': 'Atribuir Mentor',
+  },
+  'users.viewStatistics': {
+    'en-US': 'View Statistics',
+    'pt-BR': 'Ver Estatísticas',
+  },
+  'users.password': {
+    'en-US': 'Password',
+    'pt-BR': 'Senha',
+  },
+  'users.confirmPassword': {
+    'en-US': 'Confirm Password',
+    'pt-BR': 'Confirmar Senha',
+  },
+
+  // Login
+  'login.title': {
+    'en-US': 'Login',
+    'pt-BR': 'Login',
+  },
+  'login.description': {
+    'en-US': 'Login to access the platform',
+    'pt-BR': 'Entre para acessar a plataforma',
+  },
+  'login.email': {
+    'en-US': 'Email',
+    'pt-BR': 'Email',
+  },
+  'login.password': {
+    'en-US': 'Password',
+    'pt-BR': 'Senha',
+  },
+  'login.submit': {
+    'en-US': 'Login',
+    'pt-BR': 'Entrar',
+  },
+  'login.error': {
+    'en-US': 'Invalid email or password',
+    'pt-BR': 'Email ou senha inválidos',
   },
 };
 

@@ -15,9 +15,12 @@ import {
 } from '@/components/ui/table';
 import { TrendingDown, TrendingUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useLanguage } from '@/context/LanguageContext';
+import { formatCurrency } from '@/context/appUtils';
 
 const CalendarPage: React.FC = () => {
   const { state } = useAppContext();
+  const { t } = useLanguage();
   const { trades, journals, setups } = state;
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   
@@ -63,30 +66,21 @@ const CalendarPage: React.FC = () => {
     return "";
   }
   
-  // Format currency
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-    }).format(value);
-  };
-  
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Trading Calendar</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t('nav.calendar')}</h1>
         <p className="text-muted-foreground">
-          View your trading history by date
+          {t('analytics.description')}
         </p>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle>Calendar</CardTitle>
+            <CardTitle>{t('nav.calendar')}</CardTitle>
             <CardDescription>
-              Select a date to view details
+              {t('analytics.dateRange')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -165,12 +159,12 @@ const CalendarPage: React.FC = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-[80px]">Asset</TableHead>
-                        <TableHead>Setup</TableHead>
-                        <TableHead>Direction</TableHead>
+                        <TableHead className="w-[80px]">{t('trade.asset')}</TableHead>
+                        <TableHead>{t('trade.setup')}</TableHead>
+                        <TableHead>{t('trade.direction')}</TableHead>
                         <TableHead>Time</TableHead>
                         <TableHead>P/L</TableHead>
-                        <TableHead>R/R</TableHead>
+                        <TableHead>{t('trade.leverage')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -200,7 +194,7 @@ const CalendarPage: React.FC = () => {
                               </span>
                             </div>
                           </TableCell>
-                          <TableCell>{trade.riskRewardRatio}</TableCell>
+                          <TableCell>{trade.leverage}x</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
