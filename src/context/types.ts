@@ -47,3 +47,15 @@ export type AppContextType = {
   getDailyRiskStatus: () => 'safe' | 'warning' | 'danger';
   checkRiskLimit: () => boolean;
 };
+
+// User types for authentication
+export type UserRole = 'mentor' | 'mentored';
+
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  mentorId?: string; // If the user is mentored, this is the ID of their mentor
+  createdAt: Date;
+};

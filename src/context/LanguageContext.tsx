@@ -1,457 +1,439 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-type LanguageType = 'en-US' | 'pt-BR';
+type Language = 'en' | 'pt';
 
-type TranslationsType = {
+interface TranslationsType {
   [key: string]: {
-    [key in LanguageType]: string;
+    en: string;
+    pt: string;
   };
-};
-
-// Dictionary of translations
-const translations: TranslationsType = {
-  // Navigation
-  'nav.dashboard': {
-    'en-US': 'Dashboard',
-    'pt-BR': 'Painel',
-  },
-  'nav.journal': {
-    'en-US': 'Daily Journal',
-    'pt-BR': 'Diário',
-  },
-  'nav.trades': {
-    'en-US': 'Trades',
-    'pt-BR': 'Operações',
-  },
-  'nav.analytics': {
-    'en-US': 'Analytics',
-    'pt-BR': 'Análises',
-  },
-  'nav.calendar': {
-    'en-US': 'Calendar',
-    'pt-BR': 'Calendário',
-  },
-  'nav.settings': {
-    'en-US': 'Settings',
-    'pt-BR': 'Configurações',
-  },
-  'nav.users': {
-    'en-US': 'Users',
-    'pt-BR': 'Usuários',
-  },
-  'nav.calculator': {
-    'en-US': 'Leverage Calculator',
-    'pt-BR': 'Calculadora de Alavancagem',
-  },
-  'nav.login': {
-    'en-US': 'Login',
-    'pt-BR': 'Entrar',
-  },
-  'nav.logout': {
-    'en-US': 'Logout',
-    'pt-BR': 'Sair',
-  },
-
-  // Common
-  'common.required': {
-    'en-US': 'Required',
-    'pt-BR': 'Obrigatório',
-  },
-  'common.save': {
-    'en-US': 'Save',
-    'pt-BR': 'Salvar',
-  },
-  'common.cancel': {
-    'en-US': 'Cancel',
-    'pt-BR': 'Cancelar',
-  },
-  'common.delete': {
-    'en-US': 'Delete',
-    'pt-BR': 'Excluir',
-  },
-  'common.add': {
-    'en-US': 'Add',
-    'pt-BR': 'Adicionar',
-  },
-  'common.edit': {
-    'en-US': 'Edit',
-    'pt-BR': 'Editar',
-  },
-  'common.search': {
-    'en-US': 'Search',
-    'pt-BR': 'Buscar',
-  },
-  'common.filter': {
-    'en-US': 'Filter',
-    'pt-BR': 'Filtrar',
-  },
-  'common.create': {
-    'en-US': 'Create',
-    'pt-BR': 'Criar',
-  },
-  'common.close': {
-    'en-US': 'Close',
-    'pt-BR': 'Fechar',
-  },
-
-  // Risk Status
-  'risk.status': {
-    'en-US': 'Risk Status',
-    'pt-BR': 'Status de Risco',
-  },
-  'risk.within': {
-    'en-US': 'Within limits',
-    'pt-BR': 'Dentro dos limites',
-  },
-  'risk.approaching': {
-    'en-US': 'Approaching limit',
-    'pt-BR': 'Próximo ao limite',
-  },
-  'risk.exceeded': {
-    'en-US': 'Exceeded limit',
-    'pt-BR': 'Limite excedido',
-  },
-
-  // Journal
-  'journal.complete': {
-    'en-US': 'Complete daily journal',
-    'pt-BR': 'Complete o diário',
-  },
-
-  // Trade Form
-  'trade.new': {
-    'en-US': 'Log New Trade',
-    'pt-BR': 'Registrar Nova Operação',
-  },
-  'trade.edit': {
-    'en-US': 'Edit Trade',
-    'pt-BR': 'Editar Operação',
-  },
-  'trade.details': {
-    'en-US': 'Record the details of your trade',
-    'pt-BR': 'Registre os detalhes da sua operação',
-  },
-  'trade.asset': {
-    'en-US': 'Asset',
-    'pt-BR': 'Ativo',
-  },
-  'trade.searchAsset': {
-    'en-US': 'Search assets...',
-    'pt-BR': 'Buscar ativos...',
-  },
-  'trade.noAssetsFound': {
-    'en-US': 'No assets found',
-    'pt-BR': 'Nenhum ativo encontrado',
-  },
-  'trade.setup': {
-    'en-US': 'Setup',
-    'pt-BR': 'Setup',
-  },
-  'trade.direction': {
-    'en-US': 'Direction',
-    'pt-BR': 'Direção',
-  },
-  'trade.buy': {
-    'en-US': 'Buy',
-    'pt-BR': 'Compra',
-  },
-  'trade.sell': {
-    'en-US': 'Sell',
-    'pt-BR': 'Venda',
-  },
-  'trade.trend': {
-    'en-US': 'Trend Position',
-    'pt-BR': 'Posição de Tendência',
-  },
-  'trade.withTrend': {
-    'en-US': 'With Trend',
-    'pt-BR': 'Com a Tendência',
-  },
-  'trade.againstTrend': {
-    'en-US': 'Against Trend',
-    'pt-BR': 'Contra a Tendência',
-  },
-  'trade.entryTime': {
-    'en-US': 'Entry Time',
-    'pt-BR': 'Horário de Entrada',
-  },
-  'trade.exitTime': {
-    'en-US': 'Exit Time',
-    'pt-BR': 'Horário de Saída',
-  },
-  'trade.financialResult': {
-    'en-US': 'Financial Result ($)',
-    'pt-BR': 'Resultado Financeiro ($)',
-  },
-  'trade.profitLoss': {
-    'en-US': 'Profit/Loss Percentage (%)',
-    'pt-BR': 'Percentual de Lucro/Prejuízo (%)',
-  },
-  'trade.leverage': {
-    'en-US': 'Leverage',
-    'pt-BR': 'Alavancagem',
-  },
-  'trade.notes': {
-    'en-US': 'Trade Notes',
-    'pt-BR': 'Observações',
-  },
-  'trade.mistake': {
-    'en-US': 'Was this trade a mistake?',
-    'pt-BR': 'Esta operação foi um erro?',
-  },
-  'trade.mistakeDescription': {
-    'en-US': 'Mark trades that violated your trading rules or had execution errors',
-    'pt-BR': 'Marque operações que violaram suas regras ou tiveram erros de execução',
-  },
-  'trade.mistakeType': {
-    'en-US': 'Type of Mistake',
-    'pt-BR': 'Tipo de Erro',
-  },
-  'trade.modelTrade': {
-    'en-US': 'Save as Model Trade',
-    'pt-BR': 'Salvar como Operação Modelo',
-  },
-  'trade.modelDescription': {
-    'en-US': 'Mark this as an exemplary trade to reference in the future',
-    'pt-BR': 'Marque como uma operação exemplar para referência futura',
-  },
-  'trade.log': {
-    'en-US': 'Log Trade',
-    'pt-BR': 'Registrar Operação',
-  },
-  'trade.update': {
-    'en-US': 'Update Trade',
-    'pt-BR': 'Atualizar Operação',
-  },
-
-  // Settings
-  'settings.language': {
-    'en-US': 'Language',
-    'pt-BR': 'Idioma',
-  },
-  'settings.riskManagement': {
-    'en-US': 'Risk Management',
-    'pt-BR': 'Gestão de Risco',
-  },
-  'settings.tradingSetups': {
-    'en-US': 'Trading Setups',
-    'pt-BR': 'Setups de Trading',
-  },
-  'settings.mistakeTypes': {
-    'en-US': 'Mistake Types',
-    'pt-BR': 'Tipos de Erros',
-  },
-  'settings.assets': {
-    'en-US': 'Assets',
-    'pt-BR': 'Ativos',
-  },
-  'settings.newSetup': {
-    'en-US': 'New Setup Name',
-    'pt-BR': 'Nome do Novo Setup',
-  },
-  'settings.addSetup': {
-    'en-US': 'Add Setup',
-    'pt-BR': 'Adicionar Setup',
-  },
-  'settings.newMistakeType': {
-    'en-US': 'New Mistake Type',
-    'pt-BR': 'Novo Tipo de Erro',
-  },
-  'settings.addMistakeType': {
-    'en-US': 'Add Type',
-    'pt-BR': 'Adicionar Tipo',
-  },
-  'settings.newAsset': {
-    'en-US': 'New Asset Symbol',
-    'pt-BR': 'Novo Símbolo de Ativo',
-  },
-  'settings.addAsset': {
-    'en-US': 'Add Asset',
-    'pt-BR': 'Adicionar Ativo',
-  },
-
-  // Analytics
-  'analytics.title': {
-    'en-US': 'Analytics',
-    'pt-BR': 'Análises',
-  },
-  'analytics.description': {
-    'en-US': 'Detailed analysis of your trading performance',
-    'pt-BR': 'Análise detalhada do seu desempenho',
-  },
-  'analytics.filter': {
-    'en-US': 'Filter',
-    'pt-BR': 'Filtrar',
-  },
-  'analytics.month': {
-    'en-US': 'Month',
-    'pt-BR': 'Mês',
-  },
-  'analytics.dateRange': {
-    'en-US': 'Date Range',
-    'pt-BR': 'Período',
-  },
-  'analytics.startDate': {
-    'en-US': 'Start Date',
-    'pt-BR': 'Data Inicial',
-  },
-  'analytics.endDate': {
-    'en-US': 'End Date',
-    'pt-BR': 'Data Final',
-  },
-  'analytics.apply': {
-    'en-US': 'Apply',
-    'pt-BR': 'Aplicar',
-  },
-  'analytics.reset': {
-    'en-US': 'Reset',
-    'pt-BR': 'Resetar',
-  },
-
-  // Calculator
-  'calculator.title': {
-    'en-US': 'Leverage Calculator',
-    'pt-BR': 'Calculadora de Alavancagem',
-  },
-  'calculator.description': {
-    'en-US': 'Calculate the maximum leverage for your trade',
-    'pt-BR': 'Calcule a alavancagem máxima para sua operação',
-  },
-  'calculator.stopSize': {
-    'en-US': 'Stop Size (%)',
-    'pt-BR': 'Tamanho do Stop (%)',
-  },
-  'calculator.riskAmount': {
-    'en-US': 'Risk Amount ($)',
-    'pt-BR': 'Valor de Risco ($)',
-  },
-  'calculator.entryPrice': {
-    'en-US': 'Entry Price ($)',
-    'pt-BR': 'Preço de Entrada ($)',
-  },
-  'calculator.calculate': {
-    'en-US': 'Calculate',
-    'pt-BR': 'Calcular',
-  },
-  'calculator.maxLeverage': {
-    'en-US': 'Maximum Leverage',
-    'pt-BR': 'Alavancagem Máxima',
-  },
-  'calculator.positionSize': {
-    'en-US': 'Position Size',
-    'pt-BR': 'Tamanho da Posição',
-  },
-
-  // User Management
-  'users.title': {
-    'en-US': 'User Management',
-    'pt-BR': 'Gerenciamento de Usuários',
-  },
-  'users.description': {
-    'en-US': 'Manage all users of the platform',
-    'pt-BR': 'Gerencie todos os usuários da plataforma',
-  },
-  'users.list': {
-    'en-US': 'User List',
-    'pt-BR': 'Lista de Usuários',
-  },
-  'users.create': {
-    'en-US': 'Create User',
-    'pt-BR': 'Criar Usuário',
-  },
-  'users.name': {
-    'en-US': 'Name',
-    'pt-BR': 'Nome',
-  },
-  'users.email': {
-    'en-US': 'Email',
-    'pt-BR': 'Email',
-  },
-  'users.role': {
-    'en-US': 'Role',
-    'pt-BR': 'Papel',
-  },
-  'users.mentor': {
-    'en-US': 'Mentor',
-    'pt-BR': 'Mentor',
-  },
-  'users.mentored': {
-    'en-US': 'Mentored',
-    'pt-BR': 'Mentorado',
-  },
-  'users.assignMentor': {
-    'en-US': 'Assign Mentor',
-    'pt-BR': 'Atribuir Mentor',
-  },
-  'users.viewStatistics': {
-    'en-US': 'View Statistics',
-    'pt-BR': 'Ver Estatísticas',
-  },
-  'users.password': {
-    'en-US': 'Password',
-    'pt-BR': 'Senha',
-  },
-  'users.confirmPassword': {
-    'en-US': 'Confirm Password',
-    'pt-BR': 'Confirmar Senha',
-  },
-
-  // Login
-  'login.title': {
-    'en-US': 'Login',
-    'pt-BR': 'Login',
-  },
-  'login.description': {
-    'en-US': 'Login to access the platform',
-    'pt-BR': 'Entre para acessar a plataforma',
-  },
-  'login.email': {
-    'en-US': 'Email',
-    'pt-BR': 'Email',
-  },
-  'login.password': {
-    'en-US': 'Password',
-    'pt-BR': 'Senha',
-  },
-  'login.submit': {
-    'en-US': 'Login',
-    'pt-BR': 'Entrar',
-  },
-  'login.error': {
-    'en-US': 'Invalid email or password',
-    'pt-BR': 'Email ou senha inválidos',
-  },
-};
-
-interface LanguageContextType {
-  language: LanguageType;
-  setLanguage: (lang: LanguageType) => void;
-  t: (key: string) => string;
 }
 
+// All translations for the application
+const translations: TranslationsType = {
+  // Common
+  'common.loading': {
+    en: 'Loading...',
+    pt: 'Carregando...'
+  },
+  'common.save': {
+    en: 'Save',
+    pt: 'Salvar'
+  },
+  'common.cancel': {
+    en: 'Cancel',
+    pt: 'Cancelar'
+  },
+  'common.delete': {
+    en: 'Delete',
+    pt: 'Excluir'
+  },
+  'common.edit': {
+    en: 'Edit',
+    pt: 'Editar'
+  },
+  'common.required': {
+    en: 'Required',
+    pt: 'Obrigatório'
+  },
+  
+  // Navigation
+  'nav.menu': {
+    en: 'Menu',
+    pt: 'Menu'
+  },
+  'nav.dashboard': {
+    en: 'Dashboard',
+    pt: 'Painel'
+  },
+  'nav.journal': {
+    en: 'Journal',
+    pt: 'Diário'
+  },
+  'nav.trades': {
+    en: 'Trades',
+    pt: 'Operações'
+  },
+  'nav.analytics': {
+    en: 'Analytics',
+    pt: 'Análises'
+  },
+  'nav.calendar': {
+    en: 'Calendar',
+    pt: 'Calendário'
+  },
+  'nav.settings': {
+    en: 'Settings',
+    pt: 'Configurações'
+  },
+  'nav.users': {
+    en: 'Users',
+    pt: 'Usuários'
+  },
+  
+  // Risk status
+  'risk.status': {
+    en: 'Risk Status',
+    pt: 'Status de Risco'
+  },
+  'risk.within': {
+    en: 'Within limits',
+    pt: 'Dentro dos limites'
+  },
+  'risk.approaching': {
+    en: 'Approaching limit',
+    pt: 'Próximo ao limite'
+  },
+  'risk.exceeded': {
+    en: 'Limit exceeded',
+    pt: 'Limite excedido'
+  },
+  
+  // Journal
+  'journal.complete': {
+    en: 'Complete daily journal',
+    pt: 'Complete o diário do dia'
+  },
+  'journal.title': {
+    en: 'Daily Journal',
+    pt: 'Diário de Operações'
+  },
+  'journal.date': {
+    en: 'Date',
+    pt: 'Data'
+  },
+  'journal.errorReview': {
+    en: 'Error Review Completed',
+    pt: 'Revisão de Erros Concluída'
+  },
+  'journal.dailyComment': {
+    en: 'Daily Comment',
+    pt: 'Comentário do Dia'
+  },
+  'journal.goalHit': {
+    en: 'Previous Day Goal Hit',
+    pt: 'Meta do Dia Anterior Atingida'
+  },
+  
+  // Trade
+  'trade.logTitle': {
+    en: 'Trade Log',
+    pt: 'Registro de Operações'
+  },
+  'trade.logDescription': {
+    en: 'Record and track all your trading activity',
+    pt: 'Registre e acompanhe todas as suas atividades de trading'
+  },
+  'trade.new': {
+    en: 'New Trade',
+    pt: 'Nova Operação'
+  },
+  'trade.asset': {
+    en: 'Asset',
+    pt: 'Ativo'
+  },
+  'trade.setup': {
+    en: 'Setup',
+    pt: 'Setup'
+  },
+  'trade.direction': {
+    en: 'Direction',
+    pt: 'Direção'
+  },
+  'trade.trendPosition': {
+    en: 'Trend Position',
+    pt: 'Posição na Tendência'
+  },
+  'trade.entryTime': {
+    en: 'Entry Time',
+    pt: 'Hora de Entrada'
+  },
+  'trade.exitTime': {
+    en: 'Exit Time',
+    pt: 'Hora de Saída'
+  },
+  'trade.result': {
+    en: 'Result',
+    pt: 'Resultado'
+  },
+  'trade.leverage': {
+    en: 'Leverage',
+    pt: 'Alavancagem'
+  },
+  'trade.notes': {
+    en: 'Notes',
+    pt: 'Notas'
+  },
+  'trade.mistake': {
+    en: 'Mistake?',
+    pt: 'Erro?'
+  },
+  'trade.mistakeType': {
+    en: 'Mistake Type',
+    pt: 'Tipo de Erro'
+  },
+  'trade.model': {
+    en: 'Model Trade',
+    pt: 'Operação Modelo'
+  },
+  'trade.searchAsset': {
+    en: 'Search assets...',
+    pt: 'Buscar ativos...'
+  },
+  'trade.noAssetsFound': {
+    en: 'No assets found',
+    pt: 'Nenhum ativo encontrado'
+  },
+  'trade.list': {
+    en: 'Trade List',
+    pt: 'Lista de Operações'
+  },
+  'trade.added': {
+    en: 'Trade added',
+    pt: 'Operação adicionada'
+  },
+  'trade.addedDescription': {
+    en: 'Your trade has been logged successfully.',
+    pt: 'Sua operação foi registrada com sucesso.'
+  },
+  'trade.updated': {
+    en: 'Trade updated',
+    pt: 'Operação atualizada'
+  },
+  'trade.updatedDescription': {
+    en: 'Your trade has been updated successfully.',
+    pt: 'Sua operação foi atualizada com sucesso.'
+  },
+  
+  // Calculator
+  'calculator.title': {
+    en: 'Leverage Calculator',
+    pt: 'Calculadora de Alavancagem'
+  },
+  'calculator.stopSize': {
+    en: 'Stop Size (%)',
+    pt: 'Tamanho do Stop (%)'
+  },
+  'calculator.riskAmount': {
+    en: 'Risk Amount ($)',
+    pt: 'Valor de Risco ($)'
+  },
+  'calculator.entryPrice': {
+    en: 'Entry Price ($)',
+    pt: 'Preço de Entrada ($)'
+  },
+  'calculator.calculate': {
+    en: 'Calculate',
+    pt: 'Calcular'
+  },
+  'calculator.maxLeverage': {
+    en: 'Maximum Leverage',
+    pt: 'Alavancagem Máxima'
+  },
+  'calculator.positionSize': {
+    en: 'Position Size',
+    pt: 'Tamanho da Posição'
+  },
+  'calculator.riskRatio': {
+    en: 'Risk:Reward Ratio',
+    pt: 'Relação Risco:Retorno'
+  },
+  
+  // Auth
+  'auth.loginTitle': {
+    en: 'Login to Trade Compass',
+    pt: 'Entrar no Trade Compass'
+  },
+  'auth.loginDescription': {
+    en: 'Enter your credentials to access your account',
+    pt: 'Digite suas credenciais para acessar sua conta'
+  },
+  'auth.email': {
+    en: 'Email',
+    pt: 'Email'
+  },
+  'auth.password': {
+    en: 'Password',
+    pt: 'Senha'
+  },
+  'auth.login': {
+    en: 'Log In',
+    pt: 'Entrar'
+  },
+  'auth.loginSuccess': {
+    en: 'Logged in successfully',
+    pt: 'Login realizado com sucesso'
+  },
+  'auth.loginError': {
+    en: 'Login failed',
+    pt: 'Falha no login'
+  },
+  'auth.demo': {
+    en: 'Demo credentials:',
+    pt: 'Credenciais de demonstração:'
+  },
+  
+  // Users
+  'users.title': {
+    en: 'User Management',
+    pt: 'Gerenciamento de Usuários'
+  },
+  'users.description': {
+    en: 'Manage user accounts and access permissions',
+    pt: 'Gerencie contas de usuários e permissões de acesso'
+  },
+  'users.new': {
+    en: 'New User',
+    pt: 'Novo Usuário'
+  },
+  'users.list': {
+    en: 'Users',
+    pt: 'Usuários'
+  },
+  'users.name': {
+    en: 'Name',
+    pt: 'Nome'
+  },
+  'users.email': {
+    en: 'Email',
+    pt: 'Email'
+  },
+  'users.role': {
+    en: 'Role',
+    pt: 'Função'
+  },
+  'users.mentor': {
+    en: 'Mentor',
+    pt: 'Mentor'
+  },
+  'users.mentored': {
+    en: 'Mentored',
+    pt: 'Mentorado'
+  },
+  'users.actions': {
+    en: 'Actions',
+    pt: 'Ações'
+  },
+  'users.noUsersFound': {
+    en: 'No users found',
+    pt: 'Nenhum usuário encontrado'
+  },
+  'users.updated': {
+    en: 'User updated successfully',
+    pt: 'Usuário atualizado com sucesso'
+  },
+  'users.added': {
+    en: 'User added successfully',
+    pt: 'Usuário adicionado com sucesso'
+  },
+  'users.deleted': {
+    en: 'User deleted successfully',
+    pt: 'Usuário excluído com sucesso'
+  },
+  'users.editUser': {
+    en: 'Edit User',
+    pt: 'Editar Usuário'
+  },
+  'users.addUser': {
+    en: 'Add User',
+    pt: 'Adicionar Usuário'
+  },
+  'users.saveChanges': {
+    en: 'Save Changes',
+    pt: 'Salvar Alterações'
+  },
+  'users.createUser': {
+    en: 'Create User',
+    pt: 'Criar Usuário'
+  },
+  'users.selectRole': {
+    en: 'Select a role',
+    pt: 'Selecione uma função'
+  },
+  'users.assignMentor': {
+    en: 'Assign Mentor',
+    pt: 'Atribuir Mentor'
+  },
+  'users.selectMentor': {
+    en: 'Select a mentor',
+    pt: 'Selecione um mentor'
+  },
+  'users.emailNote': {
+    en: 'This will be used for login',
+    pt: 'Isso será usado para login'
+  },
+  'users.cannotDeleteSelf': {
+    en: 'You cannot delete your own account',
+    pt: 'Você não pode excluir sua própria conta'
+  },
+  'users.search': {
+    en: 'Search users...',
+    pt: 'Buscar usuários...'
+  },
+  'users.filterByRole': {
+    en: 'Filter by role',
+    pt: 'Filtrar por função'
+  },
+  'users.allRoles': {
+    en: 'All roles',
+    pt: 'Todas as funções'
+  },
+  'users.accessDenied': {
+    en: 'Access denied. Only mentors can access this page.',
+    pt: 'Acesso negado. Apenas mentores podem acessar esta página.'
+  }
+};
+
+// Context type
+type LanguageContextType = {
+  t: (key: string) => string;
+  currentLanguage: Language;
+  setLanguage: (language: Language) => void;
+};
+
+// Create the context
 const LanguageContext = createContext<LanguageContextType | null>(null);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<LanguageType>(() => {
-    const savedLanguage = localStorage.getItem('preferredLanguage');
-    return (savedLanguage as LanguageType) || 'en-US';
-  });
-
+  // Try to get language from localStorage or use browser language
+  const getBrowserLanguage = (): Language => {
+    const browserLang = navigator.language.substring(0, 2);
+    return browserLang === 'pt' ? 'pt' : 'en';
+  };
+  
+  const getInitialLanguage = (): Language => {
+    const savedLang = localStorage.getItem('language');
+    return (savedLang === 'en' || savedLang === 'pt') 
+      ? savedLang 
+      : getBrowserLanguage();
+  };
+  
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(getInitialLanguage());
+  
+  // Save language preference to localStorage when it changes
   useEffect(() => {
-    localStorage.setItem('preferredLanguage', language);
-  }, [language]);
-
+    localStorage.setItem('language', currentLanguage);
+  }, [currentLanguage]);
+  
+  // Translation function
   const t = (key: string): string => {
-    if (!translations[key]) {
+    const translation = translations[key];
+    
+    if (!translation) {
       console.warn(`Translation missing for key: ${key}`);
       return key;
     }
-    return translations[key][language];
+    
+    return translation[currentLanguage] || key;
   };
-
+  
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{
+      t,
+      currentLanguage,
+      setLanguage: setCurrentLanguage
+    }}>
       {children}
     </LanguageContext.Provider>
   );

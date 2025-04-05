@@ -33,7 +33,6 @@ const SearchableAssetSelect: React.FC<SearchableAssetSelectProps> = ({
   const { state } = useAppContext();
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
 
   // Make sure assets is always an array, even if it's undefined
   const assets = state.assets || [];
@@ -67,12 +66,7 @@ const SearchableAssetSelect: React.FC<SearchableAssetSelectProps> = ({
         <Command>
           <div className="flex items-center border-b px-3">
             <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-            <CommandInput 
-              placeholder={t('trade.searchAsset')} 
-              className="flex-1"
-              value={searchValue}
-              onValueChange={setSearchValue}
-            />
+            <CommandInput placeholder={t('trade.searchAsset')} />
           </div>
           <CommandEmpty>{t('trade.noAssetsFound')}</CommandEmpty>
           <CommandGroup>

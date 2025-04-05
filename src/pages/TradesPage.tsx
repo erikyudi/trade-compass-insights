@@ -20,14 +20,14 @@ const TradesPage: React.FC = () => {
   const handleTradeSubmit = (tradeData: Partial<Trade>) => {
     if (editingTrade) {
       updateTrade({ ...editingTrade, ...tradeData } as Trade);
-      toast.success('Trade updated', {
-        description: 'Your trade has been updated successfully.'
+      toast.success(t('trade.updated'), {
+        description: t('trade.updatedDescription')
       });
       setEditingTrade(null);
     } else {
       addTrade(tradeData as Omit<Trade, 'id' | 'createdAt'>);
-      toast.success('Trade added', {
-        description: 'Your trade has been logged successfully.'
+      toast.success(t('trade.added'), {
+        description: t('trade.addedDescription')
       });
       setIsAddingTrade(false);
     }
