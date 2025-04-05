@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   BarChart, 
@@ -42,9 +41,8 @@ const Dashboard: React.FC = () => {
   const winCount = trades.filter(trade => trade.financialResult > 0).length;
   const winRate = trades.length > 0 ? (winCount / trades.length * 100).toFixed(1) : '0.0';
   const mistakeCount = trades.filter(trade => trade.isMistake).length;
-  const averageRR = trades.length > 0 
-    ? (trades.reduce((sum, trade) => sum + trade.riskRewardRatio, 0) / trades.length).toFixed(2)
-    : '0.00';
+  
+  // Removed risk/reward ratio as requested
   
   // Data for setup performance
   const setupPerformance = setups.map(setup => {
@@ -196,15 +194,7 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Avg Risk/Reward</CardTitle>
-            <CardDescription>Average risk-to-reward ratio</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{averageRR}</p>
-          </CardContent>
-        </Card>
+        {/* Removed Risk/Reward card as requested */}
         
         <Card>
           <CardHeader className="pb-2">
@@ -215,6 +205,20 @@ const Dashboard: React.FC = () => {
             <p className="text-3xl font-bold">{mistakeCount}</p>
             <p className="text-sm text-muted-foreground">
               ({(mistakeCount / (trades.length || 1) * 100).toFixed(1)}% of trades)
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">Leverage</CardTitle>
+            <CardDescription>Average leverage used</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold">
+              {trades.length > 0 
+                ? (trades.reduce((sum, trade) => sum + trade.leverage, 0) / trades.length).toFixed(1) 
+                : '0.0'}x
             </p>
           </CardContent>
         </Card>
