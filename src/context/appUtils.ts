@@ -3,10 +3,8 @@ import { AppState } from "./types";
 
 // Utility functions for the AppContext
 export const hasDailyJournal = (state: AppState): boolean => {
-  const today = new Date().toDateString();
-  return state.journals.some(journal => 
-    new Date(journal.date).toDateString() === today && journal.errorReviewCompleted
-  );
+  // Journal is now optional, not mandatory
+  return true;
 };
 
 export const getDailyRiskStatus = (state: AppState): 'safe' | 'warning' | 'danger' => {
@@ -24,21 +22,24 @@ export const checkRiskLimit = (state: AppState): boolean => {
   return state.dailyRiskUsed < state.riskSettings.maxDailyRisk;
 };
 
-// Calculate leverage based on risk parameters
+// Calculate leverage based on new risk parameters
 export const calculateLeverage = (
-  stopSize: number, 
-  riskAmount: number, 
-  entryPrice: number
+  stopSizePercent: number, 
+  marginAmount: number, 
+  riskPercent: number
 ): { leverage: number; positionSize: number } => {
-  if (stopSize <= 0 || riskAmount <= 0 || entryPrice <= 0) {
+  if (stopSizePercent <= 0 || marginAmount <= 0 || riskPercent <= 0) {
     return { leverage: 0, positionSize: 0 };
   }
   
-  // Calculate position size based on risk amount and stop size
-  const positionSize = (riskAmount / stopSize) * 100;
+  // The maximum amount the trader is willing to lose (in dollars)
+  const maxLossAmount = (marginAmount * riskPercent) / 100;
   
-  // Calculate leverage as position size divided by entry price
-  const leverage = positionSize / entryPrice;
+  // Calculate position size based on risk amount and stop size percentage
+  const positionSize = (maxLossAmount / (stopSizePercent / 100)) * 100;
+  
+  // Calculate leverage as position size divided by margin amount
+  const leverage = positionSize / marginAmount;
   
   return {
     leverage: Number(leverage.toFixed(2)),

@@ -10,6 +10,8 @@ import { AuthProvider } from "@/context/AuthContext";
 import AppLayout from "@/components/layout/AppLayout";
 import DashboardPage from "@/pages/DashboardPage";
 import JournalPage from "@/pages/JournalPage";
+import JournalViewPage from "@/pages/JournalViewPage";
+import JournalEditPage from "@/pages/JournalEditPage";
 import TradesPage from "@/pages/TradesPage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
 import CalendarPage from "@/pages/CalendarPage";
@@ -40,6 +42,8 @@ const App = () => (
                 }>
                   <Route index element={<DashboardPage />} />
                   <Route path="journal" element={<JournalPage />} />
+                  <Route path="journal/:id/view" element={<JournalViewPage />} />
+                  <Route path="journal/:id/edit" element={<JournalEditPage />} />
                   <Route path="trades" element={<TradesPage />} />
                   <Route path="analytics" element={<AnalyticsPage />} />
                   <Route path="calendar" element={<CalendarPage />} />

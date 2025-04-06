@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
+import { useLanguage } from '@/context/LanguageContext';
 
 import { cn } from '@/lib/utils';
 import {
@@ -35,9 +36,7 @@ const formSchema = z.object({
     required_error: "Date is required",
   }),
   errorReviewCompleted: z.boolean().default(false),
-  dailyComment: z.string().min(3, { 
-    message: "Please write at least a short comment for today" 
-  }),
+  dailyComment: z.string().optional(), // Made optional as per requirements
   previousDayGoalHit: z.enum(['true', 'false', 'na'], { 
     required_error: "Please select if you hit your previous day's goal" 
   }),
@@ -45,10 +44,12 @@ const formSchema = z.object({
 
 type DailyJournalFormProps = {
   onSubmit: (data: Partial<DailyJournal>) => void;
+  initialData?: Partial<DailyJournal>;
 };
 
-const DailyJournalForm: React.FC<DailyJournalFormProps> = ({ onSubmit }) => {
+const DailyJournalForm: React.FC<DailyJournalFormProps> = ({ onSubmit, initialData }) => {
   const { state } = useAppContext();
+  const { t } = useLanguage();
   const { trades } = state;
   
   // Get recent mistakes
@@ -60,14 +61,23 @@ const DailyJournalForm: React.FC<DailyJournalFormProps> = ({ onSubmit }) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
+  // Set form default values with initialData if provided
+  const defaultValues = {
+    date: initialData?.date ? new Date(initialData.date) : today,
+    errorReviewCompleted: initialData?.errorReviewCompleted || false,
+    dailyComment: initialData?.dailyComment || '',
+    previousDayGoalHit: initialData?.previousDayGoalHit === null 
+      ? 'na' 
+      : initialData?.previousDayGoalHit === true 
+        ? 'true' 
+        : initialData?.previousDayGoalHit === false 
+          ? 'false' 
+          : 'na',
+  };
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      date: today,
-      errorReviewCompleted: false,
-      dailyComment: '',
-      previousDayGoalHit: 'na' as const,
-    },
+    defaultValues,
   });
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
@@ -84,9 +94,9 @@ const DailyJournalForm: React.FC<DailyJournalFormProps> = ({ onSubmit }) => {
   return (
     <Card className="w-full max-w-3xl">
       <CardHeader>
-        <CardTitle>Daily Trading Journal</CardTitle>
+        <CardTitle>{t('journal.entryFor')} {defaultValues.date.toLocaleDateString()}</CardTitle>
         <CardDescription>
-          Complete your pre-market routine to set yourself up for success
+          {initialData ? t('journal.editEntry') : t('journal.complete')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -98,7 +108,7 @@ const DailyJournalForm: React.FC<DailyJournalFormProps> = ({ onSubmit }) => {
               name="date"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Trading Date</FormLabel>
+                  <FormLabel>{t('journal.date')}</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -129,7 +139,7 @@ const DailyJournalForm: React.FC<DailyJournalFormProps> = ({ onSubmit }) => {
                     </PopoverContent>
                   </Popover>
                   <FormDescription>
-                    The date for this trading journal entry
+                    {t('journal.date')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -139,9 +149,9 @@ const DailyJournalForm: React.FC<DailyJournalFormProps> = ({ onSubmit }) => {
             {/* Recent Mistakes Review */}
             {recentMistakes.length > 0 && (
               <div className="space-y-4">
-                <h3 className="font-medium">Recent Mistake Review</h3>
-                <div className="bg-lightblue rounded-lg p-4 space-y-3">
-                  {recentMistakes.map((mistake, index) => (
+                <h3 className="font-medium">{t('journal.errorReview')}</h3>
+                <div className="bg-secondary rounded-lg p-4 space-y-3">
+                  {recentMistakes.map((mistake) => (
                     <div key={mistake.id} className="border-b pb-3 last:border-0 last:pb-0">
                       <p className="text-sm font-medium">{mistake.asset} - {format(new Date(mistake.entryTime), 'MMM d')}</p>
                       <p className="text-sm text-gray-600">
@@ -164,10 +174,10 @@ const DailyJournalForm: React.FC<DailyJournalFormProps> = ({ onSubmit }) => {
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
                     <FormLabel className="text-base">
-                      I have reviewed my recent trading mistakes
+                      {t('journal.errorReviewCompleted')}
                     </FormLabel>
                     <FormDescription>
-                      Confirm that you've reflected on your recent errors
+                      {t('journal.errorReview')}
                     </FormDescription>
                   </div>
                   <FormControl>
@@ -186,11 +196,11 @@ const DailyJournalForm: React.FC<DailyJournalFormProps> = ({ onSubmit }) => {
               name="previousDayGoalHit"
               render={({ field }) => (
                 <FormItem className="space-y-3">
-                  <FormLabel>Did you hit your previous day's goal?</FormLabel>
+                  <FormLabel>{t('journal.previousDayGoalHit')}</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={field.value}
                       className="flex flex-col space-y-1"
                     >
                       <FormItem className="flex items-center space-x-3 space-y-0">
@@ -198,7 +208,7 @@ const DailyJournalForm: React.FC<DailyJournalFormProps> = ({ onSubmit }) => {
                           <RadioGroupItem value="true" />
                         </FormControl>
                         <FormLabel className="font-normal">
-                          Yes, I hit my goal
+                          {t('journal.yes')}
                         </FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-3 space-y-0">
@@ -206,7 +216,7 @@ const DailyJournalForm: React.FC<DailyJournalFormProps> = ({ onSubmit }) => {
                           <RadioGroupItem value="false" />
                         </FormControl>
                         <FormLabel className="font-normal">
-                          No, I missed my goal
+                          {t('journal.no')}
                         </FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-3 space-y-0">
@@ -214,7 +224,7 @@ const DailyJournalForm: React.FC<DailyJournalFormProps> = ({ onSubmit }) => {
                           <RadioGroupItem value="na" />
                         </FormControl>
                         <FormLabel className="font-normal">
-                          Not applicable / First day
+                          {t('journal.na')}
                         </FormLabel>
                       </FormItem>
                     </RadioGroup>
@@ -230,7 +240,7 @@ const DailyJournalForm: React.FC<DailyJournalFormProps> = ({ onSubmit }) => {
               name="dailyComment"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Today's Trading Plan</FormLabel>
+                  <FormLabel>{t('journal.dailyComment')}</FormLabel>
                   <FormControl>
                     <Textarea 
                       placeholder="What are your goals for today? What setups are you looking for? What will you avoid?"
@@ -239,7 +249,7 @@ const DailyJournalForm: React.FC<DailyJournalFormProps> = ({ onSubmit }) => {
                     />
                   </FormControl>
                   <FormDescription>
-                    Write down your trading plan and intentions for the day
+                    {t('journal.comment')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -248,7 +258,7 @@ const DailyJournalForm: React.FC<DailyJournalFormProps> = ({ onSubmit }) => {
             
             <CardFooter className="flex justify-end px-0">
               <Button type="submit">
-                Complete Daily Journal
+                {initialData ? t('common.save') : t('journal.complete')}
               </Button>
             </CardFooter>
           </form>

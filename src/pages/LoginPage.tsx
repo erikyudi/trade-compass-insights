@@ -1,137 +1,143 @@
 
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useAuth } from '@/context/AuthContext';
-import { useNavigate, Navigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/components/ui/form';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6)
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { useAuth } from '@/context/AuthContext';
+import Logo from '@/components/branding/Logo';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from 'sonner';
 
 const LoginPage: React.FC = () => {
-  const { login, isAuthenticated, isLoading } = useAuth();
-  const navigate = useNavigate();
   const { t, currentLanguage, setLanguage } = useLanguage();
+  const { login } = useAuth();
+  const navigate = useNavigate();
   
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-      password: ''
-    }
-  });
+  const [email, setEmail] = useState('demo@example.com');
+  const [password, setPassword] = useState('password');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
-  // If already authenticated, redirect to dashboard
-  if (isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
-  
-  const onSubmit = async (data: FormValues) => {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
     try {
-      await login(data.email, data.password);
-      toast.success(t('auth.loginSuccess'));
+      await login(email, password, rememberMe);
       navigate('/');
-    } catch (error: any) {
-      toast.error(t('auth.loginError'), {
-        description: error.message
-      });
+    } catch (error) {
+      let errorMessage = 'Invalid credentials';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const toggleLanguage = () => {
+    if (currentLanguage === 'en-US') {
+      setLanguage('pt-BR');
+    } else {
+      setLanguage('en-US');
     }
   };
   
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 p-4">
-      <div className="absolute top-4 right-4">
-        <Button
-          variant="ghost" 
-          onClick={() => setLanguage(currentLanguage === 'en' ? 'pt' : 'en')}
-        >
-          {currentLanguage === 'en' ? '🇧🇷 Português' : '🇺🇸 English'}
-        </Button>
-      </div>
-      
-      <Card className="w-full max-w-md border-slate-700 bg-slate-800 text-white">
-        <CardHeader className="space-y-2 text-center">
-          <CardTitle className="text-2xl font-bold">{t('auth.loginTitle')}</CardTitle>
-          <CardDescription className="text-slate-400">
-            {t('auth.loginDescription')}
-          </CardDescription>
-        </CardHeader>
+    <div className="min-h-screen flex flex-col justify-center items-center bg-background p-4">
+      <div className="w-full max-w-md">
+        <div className="flex justify-center mb-8">
+          <Logo size="lg" />
+        </div>
         
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('auth.email')}</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="you@example.com" 
-                        {...field} 
-                        className="bg-slate-700 border-slate-600"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+        <div className="bg-card border border-border rounded-lg shadow-xl p-8">
+          <h1 className="text-2xl font-bold text-center mb-6">
+            {t('login.title')}
+          </h1>
+          
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="email" className="block text-sm font-medium">
+                {t('login.email')}
+              </label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                required
               />
-              
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('auth.password')}</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="password" 
-                        placeholder="••••••" 
-                        {...field} 
-                        className="bg-slate-700 border-slate-600"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            </div>
+            
+            <div className="space-y-2">
+              <label htmlFor="password" className="block text-sm font-medium">
+                {t('login.password')}
+              </label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
               />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="remember"
+                  checked={rememberMe}
+                  onCheckedChange={(checked) => 
+                    setRememberMe(checked as boolean)
+                  }
+                />
+                <label
+                  htmlFor="remember"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {t('login.rememberMe')}
+                </label>
+              </div>
               
-              <Button 
-                type="submit" 
-                className="w-full bg-blue-600 hover:bg-blue-700" 
-                disabled={isLoading}
-              >
-                {isLoading ? t('common.loading') : t('auth.login')}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-        
-        <CardFooter className="text-center text-sm text-slate-400">
-          <div className="mx-auto">
-            {t('auth.demo')} <strong>admin@example.com</strong> / <strong>123456</strong>
+              <a href="#" className="text-sm text-primary hover:underline">
+                {t('login.forgotPassword')}
+              </a>
+            </div>
+            
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Loading...' : t('login.submit')}
+            </Button>
+          </form>
+          
+          <div className="mt-6 text-center text-sm">
+            <p className="text-muted-foreground">
+              {t('login.noAccount')}{' '}
+              <a href="#" className="text-primary hover:underline">
+                {t('login.signUp')}
+              </a>
+            </p>
           </div>
-        </CardFooter>
-      </Card>
+          
+          <div className="mt-4 text-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleLanguage}
+              className="text-xs"
+            >
+              {t('login.switchLanguage')}
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

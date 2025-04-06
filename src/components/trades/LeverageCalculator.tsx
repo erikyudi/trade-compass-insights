@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { calculateLeverage, formatCurrency } from '@/context/appUtils';
 
@@ -14,37 +14,25 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Calculator } from 'lucide-react';
 
 const LeverageCalculator: React.FC = () => {
   const { t } = useLanguage();
   const [stopSize, setStopSize] = useState<number>(0);
-  const [riskAmount, setRiskAmount] = useState<number>(0);
-  const [entryPrice, setEntryPrice] = useState<number>(0);
-  const [stopType, setStopType] = useState<'percentage' | 'dollar'>('percentage');
+  const [marginAmount, setMarginAmount] = useState<number>(0);
+  const [riskPercent, setRiskPercent] = useState<number>(0);
   const [result, setResult] = useState<{ leverage: number; positionSize: number } | null>(null);
 
   const handleCalculate = () => {
-    // If stop type is percentage, convert it to dollar amount
-    const actualStopSize = stopType === 'percentage' 
-      ? (stopSize / 100) * entryPrice 
-      : stopSize;
-    
-    const calculation = calculateLeverage(actualStopSize, riskAmount, entryPrice);
+    // Calculate leverage based on stop loss percentage, margin amount, and risk percentage
+    const calculation = calculateLeverage(stopSize, marginAmount, riskPercent);
     setResult(calculation);
   };
 
   const handleReset = () => {
     setStopSize(0);
-    setRiskAmount(0);
-    setEntryPrice(0);
+    setMarginAmount(0);
+    setRiskPercent(0);
     setResult(null);
   };
 
@@ -53,41 +41,17 @@ const LeverageCalculator: React.FC = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Calculator className="h-5 w-5" />
-          {t('calculator.title') || 'Leverage Calculator'}
+          {t('calculator.title')}
         </CardTitle>
         <CardDescription>
-          {t('calculator.description') || 'Calculate the optimal leverage based on your risk parameters'}
+          {t('calculator.description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="stopType">
-              {t('calculator.stopType') || 'Stop Loss Type'}
-            </Label>
-            <Select 
-              value={stopType} 
-              onValueChange={(value) => setStopType(value as 'percentage' | 'dollar')}
-            >
-              <SelectTrigger id="stopType">
-                <SelectValue placeholder="Select stop type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="percentage">
-                  {t('calculator.percentage') || 'Percentage (%)'}
-                </SelectItem>
-                <SelectItem value="dollar">
-                  {t('calculator.dollar') || 'Dollar Value ($)'}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="space-y-2">
             <Label htmlFor="stopSize">
-              {stopType === 'percentage' 
-                ? (t('calculator.stopPercentage') || 'Stop Size (%)')
-                : (t('calculator.stopDollar') || 'Stop Size ($)')}
+              {t('calculator.stopPercentage')}
             </Label>
             <Input
               id="stopSize"
@@ -96,39 +60,37 @@ const LeverageCalculator: React.FC = () => {
               min="0"
               value={stopSize || ''}
               onChange={(e) => setStopSize(parseFloat(e.target.value) || 0)}
-              placeholder={stopType === 'percentage' ? "2.5" : "25.00"}
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="riskAmount">
-              {t('calculator.riskAmount') || 'Risk Amount ($)'}
-            </Label>
-            <Input
-              id="riskAmount"
-              type="number"
-              step="0.01"
-              min="0"
-              value={riskAmount || ''}
-              onChange={(e) => setRiskAmount(parseFloat(e.target.value) || 0)}
-              placeholder="100.00"
+              placeholder="2.5"
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="entryPrice">
-              {t('calculator.entryPrice') || 'Entry Price ($)'}
+            <Label htmlFor="marginAmount">
+              {t('calculator.marginAmount')}
             </Label>
             <Input
-              id="entryPrice"
+              id="marginAmount"
               type="number"
               step="0.01"
               min="0"
-              value={entryPrice || ''}
-              onChange={(e) => setEntryPrice(parseFloat(e.target.value) || 0)}
+              value={marginAmount || ''}
+              onChange={(e) => setMarginAmount(parseFloat(e.target.value) || 0)}
               placeholder="1000.00"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="riskPercent">
+              {t('calculator.riskPercentage')}
+            </Label>
+            <Input
+              id="riskPercent"
+              type="number"
+              step="0.01"
+              min="0"
+              value={riskPercent || ''}
+              onChange={(e) => setRiskPercent(parseFloat(e.target.value) || 0)}
+              placeholder="2.00"
             />
           </div>
         </div>
@@ -136,18 +98,18 @@ const LeverageCalculator: React.FC = () => {
         {result && (
           <div className="mt-6 rounded-lg bg-muted p-4">
             <h3 className="font-medium">
-              {t('calculator.results') || 'Calculation Results'}
+              {t('calculator.results')}
             </h3>
             <div className="mt-2 grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-muted-foreground">
-                  {t('calculator.suggestedLeverage') || 'Suggested Leverage'}
+                  {t('calculator.suggestedLeverage')}
                 </p>
                 <p className="text-2xl font-bold">{result.leverage}x</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">
-                  {t('calculator.positionSize') || 'Position Size'}
+                  {t('calculator.positionSize')}
                 </p>
                 <p className="text-2xl font-bold">{formatCurrency(result.positionSize)}</p>
               </div>
@@ -157,10 +119,10 @@ const LeverageCalculator: React.FC = () => {
       </CardContent>
       <CardFooter className="flex justify-between">
         <Button variant="outline" onClick={handleReset}>
-          {t('common.reset') || 'Reset'}
+          {t('common.reset')}
         </Button>
         <Button onClick={handleCalculate}>
-          {t('calculator.calculate') || 'Calculate'}
+          {t('calculator.calculate')}
         </Button>
       </CardFooter>
     </Card>
