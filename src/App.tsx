@@ -20,6 +20,7 @@ import LoginPage from "@/pages/LoginPage";
 import UsersPage from "@/pages/UsersPage";
 import NotFound from "@/pages/NotFound";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import ResetPasswordPage from "@/pages/ResetPasswordPage";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
             <BrowserRouter>
               <Routes>
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
                 
                 <Route path="/" element={
                   <ProtectedRoute>
@@ -48,7 +50,11 @@ const App = () => (
                   <Route path="analytics" element={<AnalyticsPage />} />
                   <Route path="calendar" element={<CalendarPage />} />
                   <Route path="settings" element={<SettingsPage />} />
-                  <Route path="users" element={<UsersPage />} />
+                  <Route path="users" element={
+                    <ProtectedRoute requiredRoles={['mentor', 'admin']}>
+                      <UsersPage />
+                    </ProtectedRoute>
+                  } />
                 </Route>
                 
                 <Route path="*" element={<NotFound />} />

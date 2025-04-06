@@ -9,6 +9,8 @@ type AuthContextType = {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   error: string | null;
+  resetPassword: (email: string) => Promise<void>;
+  setNewPassword: (token: string, password: string) => Promise<void>;
 };
 
 // Mock data for now - will be replaced with real auth later
@@ -17,7 +19,7 @@ const MOCK_USERS: User[] = [
     id: '1',
     name: 'Admin User',
     email: 'admin@example.com',
-    role: 'mentor',
+    role: 'admin',
     createdAt: new Date()
   },
   {
@@ -26,6 +28,13 @@ const MOCK_USERS: User[] = [
     email: 'student@example.com',
     role: 'mentored',
     mentorId: '1',
+    createdAt: new Date()
+  },
+  {
+    id: '3',
+    name: 'Mentor User',
+    email: 'mentor@example.com',
+    role: 'mentor',
     createdAt: new Date()
   }
 ];
@@ -80,6 +89,61 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('tradeAppUser');
   };
 
+  // Mock reset password functionality
+  const resetPassword = async (email: string) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Check if email exists - in a real app, we wouldn't reveal this
+      const userExists = MOCK_USERS.some(u => u.email.toLowerCase() === email.toLowerCase());
+      
+      if (!userExists) {
+        // In a real app, we would still return success even if email doesn't exist
+        // to prevent email enumeration attacks
+        console.log('User not found, but returning success for security');
+      }
+      
+      // In a real app, this would send an email with a reset link
+      console.log(`Reset password requested for ${email}`);
+      
+      return;
+    } catch (err: any) {
+      setError(err.message || 'Password reset failed');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Mock set new password functionality
+  const setNewPassword = async (token: string, password: string) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // In a real app, we would validate the token and update the password
+      console.log(`Setting new password with token ${token}`);
+      
+      if (!token || token.length < 10) {
+        throw new Error('Invalid token');
+      }
+      
+      return;
+    } catch (err: any) {
+      setError(err.message || 'Setting new password failed');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -87,7 +151,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isAuthenticated: !!user,
       login,
       logout,
-      error
+      error,
+      resetPassword,
+      setNewPassword
     }}>
       {children}
     </AuthContext.Provider>

@@ -2,15 +2,16 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { UserRole } from '@/types';
 
 type ProtectedRouteProps = {
   children: React.ReactNode;
-  requiredRole?: 'mentor' | 'mentored';
+  requiredRoles?: UserRole[];
 };
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
-  requiredRole 
+  requiredRoles = [] 
 }) => {
   const { isAuthenticated, isLoading, user } = useAuth();
   
@@ -28,8 +29,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" replace />;
   }
   
-  // Check for role requirement if specified
-  if (requiredRole && user?.role !== requiredRole) {
+  // Check for role requirements if specified
+  if (requiredRoles.length > 0 && user && !requiredRoles.includes(user.role)) {
     return <Navigate to="/" replace />;
   }
   

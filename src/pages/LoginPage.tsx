@@ -8,23 +8,29 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 const LoginPage: React.FC = () => {
   const { t, currentLanguage, setLanguage } = useLanguage();
   const { login } = useAuth();
   const navigate = useNavigate();
   
-  const [email, setEmail] = useState('demo@example.com');
-  const [password, setPassword] = useState('password');
+  const [email, setEmail] = useState('admin@example.com');
+  const [password, setPassword] = useState('123456');
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Forgot password functionality
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      await login(email, password, rememberMe);
+      await login(email, password);
       navigate('/');
     } catch (error) {
       let errorMessage = 'Invalid credentials';
@@ -34,6 +40,24 @@ const LoginPage: React.FC = () => {
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
+    }
+  };
+  
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsResetting(true);
+    
+    // Mock API call for password reset
+    try {
+      // In a real app, this would call your auth/forgot-password endpoint
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success(t('login.resetLinkSent'));
+      setForgotPasswordOpen(false);
+      setResetEmail('');
+    } catch (error) {
+      toast.error(t('login.resetError'));
+    } finally {
+      setIsResetting(false);
     }
   };
   
@@ -103,9 +127,13 @@ const LoginPage: React.FC = () => {
                 </label>
               </div>
               
-              <a href="#" className="text-sm text-primary hover:underline">
+              <button 
+                type="button" 
+                onClick={() => setForgotPasswordOpen(true)}
+                className="text-sm text-primary hover:underline"
+              >
                 {t('login.forgotPassword')}
-              </a>
+              </button>
             </div>
             
             <Button
@@ -113,7 +141,7 @@ const LoginPage: React.FC = () => {
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? 'Loading...' : t('login.submit')}
+              {isLoading ? t('common.loading') : t('login.submit')}
             </Button>
           </form>
           
@@ -138,6 +166,49 @@ const LoginPage: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* Forgot Password Dialog */}
+      <Dialog open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('login.resetPassword')}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleForgotPassword} className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label htmlFor="reset-email" className="block text-sm font-medium">
+                {t('login.email')}
+              </label>
+              <Input
+                id="reset-email"
+                type="email"
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                placeholder="you@example.com"
+                required
+              />
+              <p className="text-sm text-muted-foreground">
+                {t('login.resetInstructions')}
+              </p>
+            </div>
+            
+            <DialogFooter className="flex justify-between items-center mt-4">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setForgotPasswordOpen(false)}
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={isResetting || !resetEmail}
+              >
+                {isResetting ? t('common.sending') : t('login.sendResetLink')}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

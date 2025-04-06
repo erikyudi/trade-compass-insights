@@ -48,8 +48,8 @@ export type AppContextType = {
   checkRiskLimit: () => boolean;
 };
 
-// User types for authentication
-export type UserRole = 'mentor' | 'mentored';
+// User roles including admin
+export type UserRole = 'admin' | 'mentor' | 'mentored';
 
 export type User = {
   id: string;

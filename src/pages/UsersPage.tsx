@@ -11,7 +11,6 @@ import { Plus, Pencil, Trash, Search, ExternalLink } from 'lucide-react';
 import { User, UserRole } from '@/types';
 import { toast } from 'sonner';
 import UserForm from '@/components/users/UserForm';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { Link } from 'react-router-dom';
 
 // Mock users data - in a real app this would come from an API
@@ -20,7 +19,7 @@ const MOCK_USERS: User[] = [
     id: '1',
     name: 'Admin User',
     email: 'admin@example.com',
-    role: 'mentor',
+    role: 'admin', // Updated to admin
     createdAt: new Date()
   },
   {
@@ -57,8 +56,8 @@ const UsersPage: React.FC = () => {
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
-  // Only mentors can access this page
-  if (user?.role !== 'mentor') {
+  // Only admin or mentor can access this page (should be handled by ProtectedRoute)
+  if (user?.role !== 'mentor' && user?.role !== 'admin') {
     return <div>{t('users.accessDenied')}</div>;
   }
 
@@ -74,6 +73,12 @@ const UsersPage: React.FC = () => {
   });
 
   const handleUserSubmit = (userData: Partial<User>) => {
+    // Only admin can create/edit users
+    if (user.role !== 'admin' && editingUser?.id !== user.id) {
+      toast.error(t('users.notAuthorized'));
+      return;
+    }
+
     if (editingUser) {
       // Update existing user
       const updatedUsers = users.map(u => 
@@ -99,6 +104,12 @@ const UsersPage: React.FC = () => {
   };
 
   const handleDeleteUser = (userId: string) => {
+    // Only admin can delete users, and no one can delete themselves
+    if (user?.role !== 'admin') {
+      toast.error(t('users.notAuthorized'));
+      return;
+    }
+    
     // Don't allow deleting yourself
     if (userId === user?.id) {
       toast.error(t('users.cannotDeleteSelf'));
@@ -109,6 +120,16 @@ const UsersPage: React.FC = () => {
     toast.success(t('users.deleted'));
   };
 
+  // Check if current user can edit users (only admin or self-edit)
+  const canEdit = (userId: string) => {
+    return user?.role === 'admin' || userId === user?.id;
+  };
+
+  // Check if current user can delete users (only admin)
+  const canDelete = () => {
+    return user?.role === 'admin';
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -116,7 +137,7 @@ const UsersPage: React.FC = () => {
           <h1 className="text-3xl font-bold tracking-tight text-gray-100">{t('users.title')}</h1>
           <p className="text-muted-foreground">{t('users.description')}</p>
         </div>
-        {!isAddingUser && !editingUser && (
+        {!isAddingUser && !editingUser && user?.role === 'admin' && (
           <Button onClick={() => setIsAddingUser(true)} className="bg-orange-500 hover:bg-orange-600">
             <Plus className="mr-2 h-4 w-4" />
             {t('users.new')}
@@ -157,6 +178,7 @@ const UsersPage: React.FC = () => {
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-700">
                   <SelectItem value="all">{t('users.allRoles')}</SelectItem>
+                  <SelectItem value="admin">{t('users.admin')}</SelectItem>
                   <SelectItem value="mentor">{t('users.mentor')}</SelectItem>
                   <SelectItem value="mentored">{t('users.mentored')}</SelectItem>
                 </SelectContent>
@@ -187,7 +209,9 @@ const UsersPage: React.FC = () => {
                       <TableCell className="font-medium text-gray-300">{user.name}</TableCell>
                       <TableCell className="text-gray-300">{user.email}</TableCell>
                       <TableCell className="text-gray-300">
-                        {user.role === 'mentor' ? t('users.mentor') : t('users.mentored')}
+                        {user.role === 'admin' ? t('users.admin') : 
+                         user.role === 'mentor' ? t('users.mentor') : 
+                         t('users.mentored')}
                       </TableCell>
                       <TableCell className="text-gray-300">
                         {user.mentorId ? 
@@ -196,22 +220,26 @@ const UsersPage: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => setEditingUser(user)}
-                            className="border-gray-600 hover:bg-gray-700"
-                          >
-                            <Pencil className="h-4 w-4 text-orange-400" />
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => handleDeleteUser(user.id)}
-                            className="border-gray-600 hover:bg-gray-700"
-                          >
-                            <Trash className="h-4 w-4 text-red-400" />
-                          </Button>
+                          {canEdit(user.id) && (
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => setEditingUser(user)}
+                              className="border-gray-600 hover:bg-gray-700"
+                            >
+                              <Pencil className="h-4 w-4 text-orange-400" />
+                            </Button>
+                          )}
+                          {canDelete() && user.id !== user.id && (
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => handleDeleteUser(user.id)}
+                              className="border-gray-600 hover:bg-gray-700"
+                            >
+                              <Trash className="h-4 w-4 text-red-400" />
+                            </Button>
+                          )}
                           {user.role === 'mentored' && (
                             <Button
                               variant="outline"

@@ -35,7 +35,7 @@ import Logo from '@/components/branding/Logo';
 
 const AppLayout: React.FC = () => {
   const location = useLocation();
-  const { hasDailyJournal, getDailyRiskStatus } = useAppContext();
+  const { getDailyRiskStatus } = useAppContext();
   const { t } = useLanguage();
   const { user, logout } = useAuth();
   
@@ -48,13 +48,12 @@ const AppLayout: React.FC = () => {
     { title: t('nav.settings'), path: '/settings', icon: Settings }
   ];
   
-  // Add user management for mentors
-  const menuItems = user?.role === 'mentor' 
+  // Only show Users menu for mentor or admin roles
+  const menuItems = (user?.role === 'mentor' || user?.role === 'admin')
     ? [...commonMenuItems, { title: t('nav.users'), path: '/users', icon: Users }]
     : commonMenuItems;
 
   const riskStatus = getDailyRiskStatus();
-  const hasCompletedJournal = hasDailyJournal();
 
   const handleLogout = () => {
     logout();
@@ -88,10 +87,6 @@ const AppLayout: React.FC = () => {
                         >
                           <item.icon className="mr-2" size={18} />
                           <span>{item.title}</span>
-                          
-                          {item.path === '/journal' && !hasCompletedJournal && (
-                            <Badge className="ml-auto bg-orange-500">{t('common.required')}</Badge>
-                          )}
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -122,6 +117,13 @@ const AppLayout: React.FC = () => {
               <div>
                 <div className="font-medium">{user?.name}</div>
                 <div className="text-xs text-gray-400">{user?.email}</div>
+                {user?.role && (
+                  <div className="text-xs mt-1">
+                    <Badge variant="outline" className="text-xs capitalize">
+                      {user.role}
+                    </Badge>
+                  </div>
+                )}
               </div>
               <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-400 hover:text-orange-400">
                 <LogOut size={16} />
@@ -135,11 +137,6 @@ const AppLayout: React.FC = () => {
             <div className="font-medium">
               {menuItems.find(item => item.path === location.pathname)?.title || 'MyTradingMind'}
             </div>
-            {!hasCompletedJournal && (
-              <Badge className="ml-auto bg-orange-500">
-                {t('journal.complete')}
-              </Badge>
-            )}
           </header>
           <div className="p-6">
             <Outlet />

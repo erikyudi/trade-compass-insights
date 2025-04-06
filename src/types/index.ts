@@ -33,7 +33,7 @@ export type Trade = {
   mistakeTypeId?: string;
   isModelTrade: boolean;
   createdAt: Date;
-  riskRewardRatio?: string; // Add the missing property
+  riskRewardRatio?: string;
 };
 
 export type DailyJournal = {
@@ -51,8 +51,8 @@ export type RiskSettings = {
   maxDailyRisk: number; // percentage
 };
 
-// New types for the user management and role system
-export type UserRole = 'mentor' | 'mentored';
+// User roles including admin
+export type UserRole = 'admin' | 'mentor' | 'mentored';
 
 export type User = {
   id: string;
