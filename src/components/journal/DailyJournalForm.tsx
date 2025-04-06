@@ -13,6 +13,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { DailyJournal } from '@/types';
 import {
   Form,
   FormControl,
@@ -37,6 +38,7 @@ interface DailyJournalFormProps {
     dailyComment?: string;
     previousDayGoalHit?: "true" | "false" | "na";
   };
+  initialData?: DailyJournal;
   onSubmit: (data: any) => void;
   isSubmitting?: boolean;
 }
@@ -50,19 +52,32 @@ const formSchema = z.object({
 
 const DailyJournalForm: React.FC<DailyJournalFormProps> = ({
   defaultValues,
+  initialData,
   onSubmit,
   isSubmitting = false
 }) => {
   const { t } = useLanguage();
   
+  // Use initialData if provided, otherwise use defaultValues
+  const formDefaultValues = initialData ? {
+    date: initialData.date,
+    errorReviewCompleted: initialData.errorReviewCompleted,
+    dailyComment: initialData.dailyComment,
+    previousDayGoalHit: initialData.previousDayGoalHit === true 
+      ? 'true' 
+      : initialData.previousDayGoalHit === false 
+        ? 'false' 
+        : 'na'
+  } : {
+    date: defaultValues?.date || new Date(),
+    errorReviewCompleted: defaultValues?.errorReviewCompleted || false,
+    dailyComment: defaultValues?.dailyComment || '',
+    previousDayGoalHit: defaultValues?.previousDayGoalHit || 'na'
+  };
+  
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      date: defaultValues?.date || new Date(),
-      errorReviewCompleted: defaultValues?.errorReviewCompleted || false,
-      dailyComment: defaultValues?.dailyComment || '',
-      previousDayGoalHit: defaultValues?.previousDayGoalHit || 'na'
-    }
+    defaultValues: formDefaultValues
   });
 
   return (

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/context/LanguageContext';
-import { User } from '@/types';
+import { User, UserRole } from '@/types';
 import {
   Form,
   FormControl,
@@ -39,7 +39,7 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address."
   }),
-  role: z.enum(['mentor', 'mentored']),
+  role: z.enum(['admin', 'mentor', 'mentored']),
   mentorId: z.string().optional()
 });
 
@@ -129,6 +129,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, mentors, onSubmit, onCancel }
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
+                      <SelectItem value="admin">{t('users.admin')}</SelectItem>
                       <SelectItem value="mentor">{t('users.mentor')}</SelectItem>
                       <SelectItem value="mentored">{t('users.mentored')}</SelectItem>
                     </SelectContent>
