@@ -22,7 +22,7 @@ export const checkRiskLimit = (state: AppState): boolean => {
   return state.dailyRiskUsed < state.riskSettings.maxDailyRisk;
 };
 
-// Calculate leverage based on new risk parameters
+// Calculate leverage based on the formula: leverage = capitalRisk / (marginUsed × stopPercent)
 export const calculateLeverage = (
   stopSizePercent: number, 
   marginAmount: number, 
@@ -32,14 +32,17 @@ export const calculateLeverage = (
     return { leverage: 0, positionSize: 0 };
   }
   
-  // The maximum amount the trader is willing to lose (in dollars)
-  const maxLossAmount = (marginAmount * riskPercent) / 100;
+  // Calculate maximum risk amount in dollars
+  const maxRiskAmount = (marginAmount * riskPercent) / 100;
   
-  // Calculate position size based on risk amount and stop size percentage
-  const positionSize = (maxLossAmount / (stopSizePercent / 100)) * 100;
+  // Convert stop size to decimal (5% becomes 0.05)
+  const stopSizeDecimal = stopSizePercent / 100;
   
-  // Calculate leverage as position size divided by margin amount
-  const leverage = positionSize / marginAmount;
+  // Calculate leverage using the formula: leverage = capitalRisk / (marginUsed × stopPercent)
+  const leverage = maxRiskAmount / (marginAmount * stopSizeDecimal);
+  
+  // Calculate position size based on leverage and margin
+  const positionSize = marginAmount * leverage;
   
   return {
     leverage: Number(leverage.toFixed(2)),

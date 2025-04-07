@@ -35,13 +35,16 @@ const SearchableAssetSelect: React.FC<SearchableAssetSelectProps> = ({
   const [open, setOpen] = useState(false);
 
   // Make sure assets is always an array, even if it's undefined
-  const assets = state.assets || [];
+  const assets = state?.assets || [];
 
   // Handle the selection of an asset
   const handleSelect = (currentValue: string) => {
     onChange(currentValue);
     setOpen(false);
   };
+
+  // Find the selected asset
+  const selectedAsset = assets.find((asset) => asset.symbol === value);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -57,7 +60,7 @@ const SearchableAssetSelect: React.FC<SearchableAssetSelectProps> = ({
             )}
             disabled={disabled}
           >
-            {value ? assets.find((asset) => asset.symbol === value)?.symbol : t('trade.asset')}
+            {value && selectedAsset ? selectedAsset.symbol : t('trade.asset')}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </FormControl>

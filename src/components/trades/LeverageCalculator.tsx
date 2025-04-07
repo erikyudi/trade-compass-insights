@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
-import { calculateLeverage, formatCurrency } from '@/context/appUtils';
+import { formatCurrency } from '@/context/appUtils';
 
 import {
   Card,
@@ -24,9 +24,27 @@ const LeverageCalculator: React.FC = () => {
   const [result, setResult] = useState<{ leverage: number; positionSize: number } | null>(null);
 
   const handleCalculate = () => {
-    // Calculate leverage based on stop loss percentage, margin amount, and risk percentage
-    const calculation = calculateLeverage(stopSize, marginAmount, riskPercent);
-    setResult(calculation);
+    if (stopSize <= 0 || marginAmount <= 0 || riskPercent <= 0) {
+      // Don't calculate if any input is invalid
+      return;
+    }
+    
+    // Calculate maximum risk amount in dollars
+    const maxRiskAmount = (marginAmount * riskPercent) / 100;
+    
+    // Convert stop size to decimal (5% becomes 0.05)
+    const stopSizeDecimal = stopSize / 100;
+    
+    // Calculate leverage using the formula: leverage = capitalRisk / (marginUsed × stopPercent)
+    const leverage = maxRiskAmount / (marginAmount * stopSizeDecimal);
+    
+    // Calculate position size based on leverage and margin
+    const positionSize = marginAmount * leverage;
+    
+    setResult({
+      leverage: Number(leverage.toFixed(2)),
+      positionSize: Number(positionSize.toFixed(2))
+    });
   };
 
   const handleReset = () => {
