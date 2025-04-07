@@ -72,23 +72,30 @@ const SearchableAssetSelect: React.FC<SearchableAssetSelectProps> = ({
             <CommandInput placeholder={t('trade.searchAsset')} />
           </div>
           <CommandEmpty>{t('trade.noAssetsFound')}</CommandEmpty>
-          <CommandGroup>
-            {assets.map((asset) => (
-              <CommandItem
-                key={asset.id}
-                value={asset.symbol}
-                onSelect={handleSelect}
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value === asset.symbol ? "opacity-100" : "opacity-0"
-                  )}
-                />
-                {asset.symbol}
-              </CommandItem>
-            ))}
-          </CommandGroup>
+          {/* Ensure CommandGroup always has children by checking if assets array is not empty */}
+          {assets.length > 0 ? (
+            <CommandGroup>
+              {assets.map((asset) => (
+                <CommandItem
+                  key={asset.id}
+                  value={asset.symbol}
+                  onSelect={handleSelect}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === asset.symbol ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {asset.symbol}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          ) : (
+            <div className="py-6 text-center text-sm">
+              {t('trade.noAssets')}
+            </div>
+          )}
         </Command>
       </PopoverContent>
     </Popover>
