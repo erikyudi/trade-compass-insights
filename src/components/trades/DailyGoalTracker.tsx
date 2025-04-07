@@ -18,7 +18,7 @@ const DailyGoalTracker: React.FC<DailyGoalTrackerProps> = ({ dailyTarget }) => {
   
   // Calculate the daily target based on the initial capital and daily profit percentage (default 1%)
   const calculatedTarget = dailyTarget || (riskSettings?.initialCapital 
-    ? riskSettings.initialCapital * (riskSettings.dailyProfitPercent || 1) / 100 
+    ? riskSettings.initialCapital * (riskSettings.dailyProfitTarget || 1) / 100 
     : 50);
   
   // Calculate the percentage of target reached
