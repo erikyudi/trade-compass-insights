@@ -49,8 +49,8 @@ const JournalPage: React.FC = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t('journal.title')}</h1>
-        <p className="text-muted-foreground">{t('journal.description')}</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('journal.entries')}</h1>
+        <p className="text-muted-foreground">{t('journal.entriesDescription')}</p>
       </div>
 
       {sortedJournals.length > 0 && (

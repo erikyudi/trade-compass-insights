@@ -34,8 +34,8 @@ const SearchableAssetSelect: React.FC<SearchableAssetSelectProps> = ({
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
 
-  // Make sure assets is always an array, even if it's undefined
-  const assets = state?.assets || [];
+  // Make sure assets is always an array
+  const assets = Array.isArray(state?.assets) ? state.assets : [];
 
   // Handle the selection of an asset
   const handleSelect = (currentValue: string) => {
@@ -72,7 +72,6 @@ const SearchableAssetSelect: React.FC<SearchableAssetSelectProps> = ({
             <CommandInput placeholder={t('trade.searchAsset')} />
           </div>
           <CommandEmpty>{t('trade.noAssetsFound')}</CommandEmpty>
-          {/* Ensure CommandGroup always has children by checking if assets array is not empty */}
           {assets.length > 0 ? (
             <CommandGroup>
               {assets.map((asset) => (
