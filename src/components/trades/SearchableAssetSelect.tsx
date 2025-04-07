@@ -35,7 +35,7 @@ const SearchableAssetSelect: React.FC<SearchableAssetSelectProps> = ({
   const [open, setOpen] = useState(false);
 
   // Make sure assets is always an array
-  const assets = Array.isArray(state?.assets) ? state.assets : [];
+  const assets = state?.assets ? Array.isArray(state.assets) ? state.assets : [] : [];
 
   // Handle the selection of an asset
   const handleSelect = (currentValue: string) => {

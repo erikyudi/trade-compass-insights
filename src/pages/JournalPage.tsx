@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,6 +10,22 @@ import DailyJournalForm from '@/components/journal/DailyJournalForm';
 import { toast } from 'sonner';
 import { formatDate } from '@/context/appUtils';
 import { DailyJournal } from '@/types';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const JournalPage: React.FC = () => {
   const { t } = useLanguage();
@@ -18,6 +34,10 @@ const JournalPage: React.FC = () => {
     addJournal 
   } = useAppContext();
   const navigate = useNavigate();
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   const handleSubmit = (data: {
     date: Date;
@@ -42,9 +62,103 @@ const JournalPage: React.FC = () => {
     navigate('/');
   };
 
+  // Sort journals by date (newest first)
   const sortedJournals = [...journals].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
+  
+  // Calculate pagination
+  const totalPages = Math.ceil(sortedJournals.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = sortedJournals.slice(indexOfFirstItem, indexOfLastItem);
+  
+  // Change page
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+  
+  // Change items per page
+  const handleItemsPerPageChange = (value: string) => {
+    setItemsPerPage(Number(value));
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
+  // Generate page numbers
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    const maxPagesToShow = 5;
+    
+    if (totalPages <= maxPagesToShow) {
+      // Show all pages if total is less than max
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(
+          <PaginationItem key={i}>
+            <PaginationLink
+              onClick={() => paginate(i)}
+              isActive={i === currentPage}
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+    } else {
+      // Show limited pages with ellipsis
+      const startPage = Math.max(1, currentPage - 1);
+      const endPage = Math.min(totalPages, currentPage + 1);
+      
+      // First page
+      if (startPage > 1) {
+        pageNumbers.push(
+          <PaginationItem key={1}>
+            <PaginationLink onClick={() => paginate(1)}>1</PaginationLink>
+          </PaginationItem>
+        );
+        
+        if (startPage > 2) {
+          pageNumbers.push(
+            <PaginationItem key="ellipsis-start">
+              <PaginationEllipsis />
+            </PaginationItem>
+          );
+        }
+      }
+      
+      // Middle pages
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(
+          <PaginationItem key={i}>
+            <PaginationLink
+              onClick={() => paginate(i)}
+              isActive={i === currentPage}
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+      
+      // Last page
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          pageNumbers.push(
+            <PaginationItem key="ellipsis-end">
+              <PaginationEllipsis />
+            </PaginationItem>
+          );
+        }
+        
+        pageNumbers.push(
+          <PaginationItem key={totalPages}>
+            <PaginationLink onClick={() => paginate(totalPages)}>
+              {totalPages}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+    }
+    
+    return pageNumbers;
+  };
 
   return (
     <div className="space-y-8">
@@ -57,9 +171,28 @@ const JournalPage: React.FC = () => {
         <>
           <Card>
             <CardContent className="p-6">
-              <h2 className="text-xl font-semibold mb-4">{t('journal.previousEntries')}</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">{t('journal.previousEntries')}</h2>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-muted-foreground">{t('common.itemsPerPage')}:</span>
+                  <Select
+                    value={itemsPerPage.toString()}
+                    onValueChange={handleItemsPerPageChange}
+                  >
+                    <SelectTrigger className="w-20">
+                      <SelectValue placeholder="5" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">5</SelectItem>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="25">25</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
               <div className="space-y-4">
-                {sortedJournals.map((journal) => (
+                {currentItems.map((journal) => (
                   <div key={journal.id} className="flex justify-between items-center pb-4 border-b border-border last:border-0 last:pb-0">
                     <div>
                       <h3 className="font-medium">{formatDate(journal.date)}</h3>
@@ -87,6 +220,28 @@ const JournalPage: React.FC = () => {
                   </div>
                 ))}
               </div>
+              
+              {totalPages > 1 && (
+                <Pagination className="mt-4">
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => currentPage > 1 && paginate(currentPage - 1)}
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+                    
+                    {renderPageNumbers()}
+                    
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => currentPage < totalPages && paginate(currentPage + 1)}
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              )}
             </CardContent>
           </Card>
           <Separator />

@@ -7,6 +7,7 @@ import { Trade } from '@/types';
 import TradeForm from '@/components/trades/TradeForm';
 import TradeList from '@/components/trades/TradeList';
 import LeverageCalculator from '@/components/trades/LeverageCalculator';
+import DailyGoalTracker from '@/components/trades/DailyGoalTracker';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/context/LanguageContext';
@@ -83,6 +84,7 @@ const TradesPage: React.FC = () => {
           </TabsList>
           
           <TabsContent value="trades">
+            <DailyGoalTracker dailyTarget={50} />
             <TradeList onEdit={handleEditTrade} />
           </TabsContent>
           

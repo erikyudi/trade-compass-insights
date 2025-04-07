@@ -12,7 +12,7 @@ import { ArrowLeft } from 'lucide-react';
 const JournalEditPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { state, addJournal } = useAppContext();
+  const { state, updateJournal } = useAppContext();
   const { t } = useLanguage();
   const [journal, setJournal] = useState<DailyJournal | null>(null);
   
@@ -35,7 +35,8 @@ const JournalEditPage: React.FC = () => {
       ...updatedJournal,
     };
     
-    addJournal(updatedData);
+    // Use updateJournal instead of addJournal to prevent duplication
+    updateJournal(updatedData);
     toast.success(t('journal.updated'), {
       description: 'Your journal entry has been updated successfully.'
     });
@@ -59,7 +60,7 @@ const JournalEditPage: React.FC = () => {
             {t('journal.editEntry')}
           </h1>
           <p className="text-muted-foreground">
-            Update your journal entry
+            {t('journal.updateDescription')}
           </p>
         </div>
         <Button 

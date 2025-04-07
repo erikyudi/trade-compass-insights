@@ -116,6 +116,19 @@ export const appReducer = (state: AppState, action: ActionType): AppState => {
       break;
     }
     
+    case 'UPDATE_JOURNAL': {
+      // Update the existing journal entry
+      const updatedJournals = state.journals.map(journal => 
+        journal.id === action.payload.id ? action.payload : journal
+      );
+      
+      newState = {
+        ...state,
+        journals: updatedJournals
+      };
+      break;
+    }
+    
     case 'UPDATE_RISK_SETTINGS': {
       newState = {
         ...state,
