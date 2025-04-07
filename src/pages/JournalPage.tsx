@@ -43,8 +43,8 @@ const JournalPage: React.FC = () => {
   const { t } = useLanguage();
   const { 
     state: { journals }, 
-    addJournal, 
-    deleteTrade: deleteJournal 
+    addJournal,
+    deleteJournal
   } = useAppContext();
   const navigate = useNavigate();
   

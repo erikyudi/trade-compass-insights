@@ -129,6 +129,17 @@ export const appReducer = (state: AppState, action: ActionType): AppState => {
       break;
     }
     
+    case 'DELETE_JOURNAL': {
+      // Delete the journal entry
+      const filteredJournals = state.journals.filter(journal => journal.id !== action.payload);
+      
+      newState = {
+        ...state,
+        journals: filteredJournals
+      };
+      break;
+    }
+    
     case 'UPDATE_RISK_SETTINGS': {
       newState = {
         ...state,

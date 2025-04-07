@@ -45,10 +45,10 @@ const TradesPage: React.FC = () => {
     setIsAddingTrade(false);
   };
 
-  // Set daily target based on initial capital from risk settings
-  const dailyTarget = state.riskSettings?.initialCapital 
-    ? state.riskSettings.initialCapital * 0.01 // Default to 1% of initial capital
-    : 50; // Default target if no initial capital is set
+  // Calculate the daily target based on the initial capital and daily profit percentage
+  const dailyTarget = state.riskSettings?.initialCapital && state.riskSettings?.dailyProfitPercent
+    ? state.riskSettings.initialCapital * (state.riskSettings.dailyProfitPercent / 100)
+    : 50; // Default target if no settings are available
 
   return (
     <div className="space-y-8">

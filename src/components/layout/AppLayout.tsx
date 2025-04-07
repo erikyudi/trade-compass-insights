@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Sidebar, 
   SidebarContent, 
@@ -11,7 +11,8 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarProvider,
-  SidebarFooter
+  SidebarFooter,
+  SidebarTrigger
 } from '@/components/ui/sidebar';
 import { 
   BarChart3, 
@@ -20,7 +21,6 @@ import {
   Home, 
   Settings, 
   TrendingUp,
-  AlertCircle,
   Users,
   LogOut
 } from 'lucide-react';
@@ -35,7 +35,6 @@ import Logo from '@/components/branding/Logo';
 
 const AppLayout: React.FC = () => {
   const location = useLocation();
-  const { getDailyRiskStatus } = useAppContext();
   const { t } = useLanguage();
   const { user, logout } = useAuth();
   
@@ -53,16 +52,14 @@ const AppLayout: React.FC = () => {
     ? [...commonMenuItems, { title: t('nav.users'), path: '/users', icon: Users }]
     : commonMenuItems;
 
-  const riskStatus = getDailyRiskStatus();
-
   const handleLogout = () => {
     logout();
   };
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-black text-gray-200">
-        <Sidebar className="bg-gray-900 text-gray-300 border-r border-gray-800" collapsible="none">
+        <Sidebar className="bg-gray-900 text-gray-300 border-r border-gray-800" collapsible="icon">
           <SidebarHeader className="py-6">
             <div className="px-6 flex items-center justify-center">
               <Logo size="md" />
@@ -75,7 +72,7 @@ const AppLayout: React.FC = () => {
                 <SidebarMenu>
                   {menuItems.map((item) => (
                     <SidebarMenuItem key={item.path}>
-                      <SidebarMenuButton asChild>
+                      <SidebarMenuButton asChild tooltip={item.title}>
                         <Link 
                           to={item.path}
                           className={cn(
@@ -96,23 +93,6 @@ const AppLayout: React.FC = () => {
             </SidebarGroup>
           </SidebarContent>
           <SidebarFooter className="p-6 space-y-4">
-            <div className={cn(
-              "flex items-center p-3 rounded-md",
-              riskStatus === 'safe' && "bg-green-900/20 text-green-400",
-              riskStatus === 'warning' && "bg-yellow-900/20 text-yellow-400",
-              riskStatus === 'danger' && "bg-red-900/20 text-red-400",
-            )}>
-              <AlertCircle size={18} className="mr-2" />
-              <div>
-                <div className="text-sm font-medium">{t('risk.status')}</div>
-                <div className="text-xs">
-                  {riskStatus === 'safe' && t('risk.within')}
-                  {riskStatus === 'warning' && t('risk.approaching')}
-                  {riskStatus === 'danger' && t('risk.exceeded')}
-                </div>
-              </div>
-            </div>
-            
             <div className="flex items-center justify-between border-t border-gray-800 pt-4">
               <div>
                 <div className="font-medium">{user?.name}</div>
@@ -134,6 +114,7 @@ const AppLayout: React.FC = () => {
         
         <main className="flex-1 overflow-auto">
           <header className="bg-gray-900 border-b border-gray-800 p-4 flex items-center">
+            <SidebarTrigger className="mr-2" />
             <div className="font-medium">
               {menuItems.find(item => item.path === location.pathname)?.title || 'MyTradingMind'}
             </div>

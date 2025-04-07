@@ -35,7 +35,7 @@ const SearchableAssetSelect: React.FC<SearchableAssetSelectProps> = ({
   const [open, setOpen] = useState(false);
 
   // Make sure assets is always a valid array
-  const assets = state?.assets ? Array.isArray(state.assets) ? state.assets : [] : [];
+  const assets = state?.assets ? (Array.isArray(state.assets) ? state.assets : []) : [];
 
   // Handle the selection of an asset
   const handleSelect = (currentValue: string) => {
@@ -73,7 +73,7 @@ const SearchableAssetSelect: React.FC<SearchableAssetSelectProps> = ({
           </div>
           <CommandEmpty>{t('trade.noAssetsFound')}</CommandEmpty>
           <CommandGroup>
-            {assets.length > 0 ? (
+            {assets && assets.length > 0 ? (
               assets.map((asset) => (
                 <CommandItem
                   key={asset.id}

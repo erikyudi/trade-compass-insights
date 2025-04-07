@@ -11,17 +11,22 @@ interface DailyGoalTrackerProps {
   dailyTarget?: number;
 }
 
-const DailyGoalTracker: React.FC<DailyGoalTrackerProps> = ({ dailyTarget = 50 }) => {
+const DailyGoalTracker: React.FC<DailyGoalTrackerProps> = ({ dailyTarget }) => {
   const { state } = useAppContext();
   const { t } = useLanguage();
-  const { dailyTradeProfit } = state;
+  const { dailyTradeProfit, riskSettings } = state;
+  
+  // Calculate the daily target based on the initial capital and daily profit percentage (default 1%)
+  const calculatedTarget = dailyTarget || (riskSettings?.initialCapital 
+    ? riskSettings.initialCapital * (riskSettings.dailyProfitPercent || 1) / 100 
+    : 50);
   
   // Calculate the percentage of target reached
-  const progressPercentage = Math.min(100, Math.max(0, (dailyTradeProfit / dailyTarget) * 100));
+  const progressPercentage = Math.min(100, Math.max(0, (dailyTradeProfit / calculatedTarget) * 100));
   
   // Determine the status indicator
   const getStatusIndicator = () => {
-    if (dailyTradeProfit >= dailyTarget) {
+    if (dailyTradeProfit >= calculatedTarget) {
       return {
         icon: <CircleCheck className="h-6 w-6 text-green-500" />,
         message: t('trade.goalReached'),
@@ -65,7 +70,7 @@ const DailyGoalTracker: React.FC<DailyGoalTrackerProps> = ({ dailyTarget = 50 })
         
         <div className="mt-4">
           <div className="flex justify-between mb-1">
-            <span className="text-sm">{t('trade.target')}: {formatCurrency(dailyTarget)}</span>
+            <span className="text-sm">{t('trade.target')}: {formatCurrency(calculatedTarget)}</span>
             <span className="text-sm">{Math.round(progressPercentage)}%</span>
           </div>
           <Progress value={progressPercentage} className="h-2" />

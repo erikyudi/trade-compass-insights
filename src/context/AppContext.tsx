@@ -55,6 +55,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     deleteTrade: (id) => dispatch({ type: 'DELETE_TRADE', payload: id }),
     addJournal: (journal) => dispatch({ type: 'ADD_JOURNAL', payload: journal as DailyJournal }),
     updateJournal: (journal) => dispatch({ type: 'UPDATE_JOURNAL', payload: journal }),
+    deleteJournal: (id) => dispatch({ type: 'DELETE_JOURNAL', payload: id }),
     updateRiskSettings: (settings) => dispatch({ type: 'UPDATE_RISK_SETTINGS', payload: settings }),
     addSetup: (setup) => dispatch({ type: 'ADD_SETUP', payload: setup }),
     deleteSetup: (id) => dispatch({ type: 'DELETE_SETUP', payload: id }),
