@@ -20,6 +20,7 @@ export type ActionType =
   | { type: 'DELETE_TRADE'; payload: string }
   | { type: 'ADD_JOURNAL'; payload: DailyJournal }
   | { type: 'UPDATE_JOURNAL'; payload: DailyJournal }
+  | { type: 'DELETE_JOURNAL'; payload: string }
   | { type: 'UPDATE_RISK_SETTINGS'; payload: RiskSettings }
   | { type: 'ADD_SETUP'; payload: Omit<SetupType, 'id'> }
   | { type: 'DELETE_SETUP'; payload: string }
@@ -37,6 +38,7 @@ export type AppContextType = {
   deleteTrade: (id: string) => void;
   addJournal: (journal: Omit<DailyJournal, 'id' | 'createdAt'>) => void;
   updateJournal: (journal: DailyJournal) => void;
+  deleteJournal: (id: string) => void;
   updateRiskSettings: (settings: RiskSettings) => void;
   addSetup: (setup: Omit<SetupType, 'id'>) => void;
   deleteSetup: (id: string) => void;

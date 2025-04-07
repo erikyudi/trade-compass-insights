@@ -8,12 +8,13 @@ import TradeForm from '@/components/trades/TradeForm';
 import TradeList from '@/components/trades/TradeList';
 import LeverageCalculator from '@/components/trades/LeverageCalculator';
 import DailyGoalTracker from '@/components/trades/DailyGoalTracker';
+import RiskManager from '@/components/trades/RiskManager';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/context/LanguageContext';
 
 const TradesPage: React.FC = () => {
-  const { addTrade, updateTrade } = useAppContext();
+  const { addTrade, updateTrade, state } = useAppContext();
   const { t } = useLanguage();
   const [isAddingTrade, setIsAddingTrade] = useState(false);
   const [editingTrade, setEditingTrade] = useState<Trade | null>(null);
@@ -44,19 +45,24 @@ const TradesPage: React.FC = () => {
     setIsAddingTrade(false);
   };
 
+  // Set daily target based on initial capital from risk settings
+  const dailyTarget = state.riskSettings?.initialCapital 
+    ? state.riskSettings.initialCapital * 0.01 // Default to 1% of initial capital
+    : 50; // Default target if no initial capital is set
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t('trade.logTitle') || 'Trade Log'}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('trade.logTitle')}</h1>
           <p className="text-muted-foreground">
-            {t('trade.logDescription') || 'Record and track all your trading activity'}
+            {t('trade.logDescription')}
           </p>
         </div>
         {!isAddingTrade && !editingTrade && (
           <Button onClick={() => setIsAddingTrade(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            {t('trade.new') || 'New Trade'}
+            {t('trade.new')}
           </Button>
         )}
       </div>
@@ -79,17 +85,22 @@ const TradesPage: React.FC = () => {
       {!isAddingTrade && !editingTrade && (
         <Tabs defaultValue="trades" className="w-full">
           <TabsList>
-            <TabsTrigger value="trades">{t('trade.list') || 'Trade List'}</TabsTrigger>
-            <TabsTrigger value="calculator">{t('calculator.title') || 'Leverage Calculator'}</TabsTrigger>
+            <TabsTrigger value="trades">{t('trade.list')}</TabsTrigger>
+            <TabsTrigger value="calculator">{t('calculator.title')}</TabsTrigger>
+            <TabsTrigger value="risk">{t('trade.riskManager')}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="trades">
-            <DailyGoalTracker dailyTarget={50} />
+            <DailyGoalTracker dailyTarget={dailyTarget} />
             <TradeList onEdit={handleEditTrade} />
           </TabsContent>
           
           <TabsContent value="calculator">
             <LeverageCalculator />
+          </TabsContent>
+          
+          <TabsContent value="risk">
+            <RiskManager />
           </TabsContent>
         </Tabs>
       )}

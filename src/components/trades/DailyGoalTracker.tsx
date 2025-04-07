@@ -30,7 +30,7 @@ const DailyGoalTracker: React.FC<DailyGoalTrackerProps> = ({ dailyTarget = 50 })
     } else if (progressPercentage >= 50) {
       return {
         icon: <CircleDot className="h-6 w-6 text-yellow-500" />,
-        message: t('trade.goalProgress', { percentage: Math.round(progressPercentage) }),
+        message: t('trade.goalProgress').replace('{percentage}', Math.round(progressPercentage).toString()),
         color: 'bg-yellow-500'
       };
     } else {

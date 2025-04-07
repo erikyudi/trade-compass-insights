@@ -34,7 +34,7 @@ const SearchableAssetSelect: React.FC<SearchableAssetSelectProps> = ({
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
 
-  // Make sure assets is always an array
+  // Make sure assets is always a valid array
   const assets = state?.assets ? Array.isArray(state.assets) ? state.assets : [] : [];
 
   // Handle the selection of an asset
@@ -72,9 +72,9 @@ const SearchableAssetSelect: React.FC<SearchableAssetSelectProps> = ({
             <CommandInput placeholder={t('trade.searchAsset')} />
           </div>
           <CommandEmpty>{t('trade.noAssetsFound')}</CommandEmpty>
-          {assets.length > 0 ? (
-            <CommandGroup>
-              {assets.map((asset) => (
+          <CommandGroup>
+            {assets.length > 0 ? (
+              assets.map((asset) => (
                 <CommandItem
                   key={asset.id}
                   value={asset.symbol}
@@ -88,13 +88,11 @@ const SearchableAssetSelect: React.FC<SearchableAssetSelectProps> = ({
                   />
                   {asset.symbol}
                 </CommandItem>
-              ))}
-            </CommandGroup>
-          ) : (
-            <div className="py-6 text-center text-sm">
-              {t('trade.noAssets')}
-            </div>
-          )}
+              ))
+            ) : (
+              <CommandItem disabled>{t('trade.noAssets')}</CommandItem>
+            )}
+          </CommandGroup>
         </Command>
       </PopoverContent>
     </Popover>

@@ -42,6 +42,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import SearchableAssetSelect from './SearchableAssetSelect';
 
+// Modify the schema to make exitTime optional
 const formSchema = z.object({
   asset: z.string().min(1, { message: 'Asset symbol is required' }),
   setupId: z.string().min(1, { message: 'Setup is required' }),
@@ -52,7 +53,7 @@ const formSchema = z.object({
     required_error: 'Trend position is required' 
   }),
   entryTime: z.date({ required_error: 'Entry time is required' }),
-  exitTime: z.date({ required_error: 'Exit time is required' }),
+  exitTime: z.date().optional(), // Make exitTime optional
   financialResult: z.number({ 
     required_error: 'Financial result is required',
     invalid_type_error: 'Must be a number'
@@ -94,7 +95,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
     direction: 'Buy' as const,
     trendPosition: 'With' as const,
     entryTime: new Date(),
-    exitTime: new Date(),
+    exitTime: undefined, // Default to undefined (no exit time)
     financialResult: 0,
     profitLossPercentage: 0,
     leverage: 1,
@@ -110,6 +111,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
   });
   
   const isMistake = form.watch('isMistake');
+  const exitTime = form.watch('exitTime');
   
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     if (!hasDailyJournal()) {
@@ -319,7 +321,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                             {field.value ? (
                               format(field.value, "PPP HH:mm")
                             ) : (
-                              <span>Select date and time</span>
+                              <span>Select exit date and time</span>
                             )}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
@@ -339,7 +341,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                             value={field.value ? format(field.value, "HH:mm") : ""}
                             onChange={(e) => {
                               const [hours, minutes] = e.target.value.split(':');
-                              const newDate = new Date(field.value);
+                              const newDate = field.value || new Date();
                               newDate.setHours(parseInt(hours), parseInt(minutes));
                               field.onChange(newDate);
                             }}

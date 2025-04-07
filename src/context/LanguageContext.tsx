@@ -43,11 +43,18 @@ const translations: Record<Language, Record<string, string>> = {
     "common.submit": "Submit",
     "common.submitting": "Submitting...",
     "common.itemsPerPage": "Items per page",
+    "common.confirmDelete": "Are you sure you want to delete this?",
+    "common.confirmDeleteDescription": "This action cannot be undone.",
     
     "risk.status": "Risk Status",
     "risk.within": "Within limit",
     "risk.approaching": "Approaching limit",
     "risk.exceeded": "Limit exceeded",
+    "risk.management": "Risk Management",
+    "risk.dailyLimit": "Daily Risk Limit",
+    "risk.initialCapital": "Initial Capital",
+    "risk.maxLoss": "Maximum Daily Loss",
+    "risk.warningThreshold": "Warning Threshold",
     
     "journal.title": "Trading Journal",
     "journal.description": "Record your daily trading activities and reflections",
@@ -79,6 +86,9 @@ const translations: Record<Language, Record<string, string>> = {
     "journal.previousEntries": "Previous Entries",
     "journal.newEntry": "New Journal Entry",
     "journal.selectGoalStatus": "Select goal status",
+    "journal.duplicateEntry": "You have already submitted a journal entry for this date.",
+    "journal.deleteConfirm": "Delete Journal Entry",
+    "journal.deleteConfirmMessage": "Are you sure you want to delete this journal entry? This action cannot be undone.",
     
     "settings.language": "Language",
     "settings.riskManagement": "Risk Management",
@@ -136,6 +146,7 @@ const translations: Record<Language, Record<string, string>> = {
     "trade.goalNotReached": "Today's goal not reached.",
     "trade.todayPnL": "Today's P&L",
     "trade.target": "Target",
+    "trade.riskManager": "Risk Manager",
     
     "calculator.title": "Leverage Calculator",
     "calculator.description": "Calculate the optimal leverage based on your risk parameters",
@@ -163,6 +174,7 @@ const translations: Record<Language, Record<string, string>> = {
     "analytics.filter": "Filter",
     "analytics.reset": "Reset Filters",
     "analytics.apply": "Apply Filters",
+    "analytics.traderDetails": "Trader Analytics",
     
     "users.title": "User Management",
     "users.description": "Manage mentored traders and other mentors",
@@ -185,7 +197,6 @@ const translations: Record<Language, Record<string, string>> = {
     "users.noUsersFound": "No users found",
     "users.accessDenied": "Access denied. Only mentors can view this page.",
     "users.editUser": "Edit User",
-    "users.admin": "Admin",
     
     "login.title": "Login",
     "login.email": "Email",
@@ -195,7 +206,27 @@ const translations: Record<Language, Record<string, string>> = {
     "login.forgotPassword": "Forgot password?",
     "login.noAccount": "Don't have an account?",
     "login.signUp": "Sign up",
-    "login.switchLanguage": "Switch to Portuguese"
+    "login.switchLanguage": "Switch to Portuguese",
+
+    "dashboard.title": "Dashboard",
+    "dashboard.description": "Your trading performance at a glance",
+    "dashboard.completeJournal": "Complete Daily Journal",
+    "dashboard.logTrade": "Log New Trade",
+    "dashboard.journalRequired": "Daily Journal Required",
+    "dashboard.journalRequiredDesc": "Complete your daily journal before trading to improve discipline and focus.",
+    "dashboard.goToJournal": "Go to Journal",
+    "dashboard.readyToTrade": "Ready to Start Trading",
+    "dashboard.readyToTradeDesc": "You've completed your daily journal. Now you can log your trades.",
+    "dashboard.logFirstTrade": "Log First Trade",
+    "dashboard.welcome": "Welcome to Trade Compass",
+    "dashboard.welcomeDesc": "Your personal trading risk and performance management system",
+    "dashboard.dashboardDesc": "This dashboard will display your trading analytics once you start logging trades. First, complete your daily journal to set intentions for the day.",
+    "dashboard.step1": "Step 1",
+    "dashboard.step1Desc": "Complete your daily journal and error review",
+    "dashboard.step2": "Step 2",
+    "dashboard.step2Desc": "Log your trades with complete details",
+    "dashboard.step3": "Step 3",
+    "dashboard.step3Desc": "Configure your risk management settings"
   },
   "pt-BR": {
     "app.title": "MyTradingMind",
@@ -224,11 +255,18 @@ const translations: Record<Language, Record<string, string>> = {
     "common.submit": "Enviar",
     "common.submitting": "Enviando...",
     "common.itemsPerPage": "Itens por página",
+    "common.confirmDelete": "Tem certeza que deseja excluir isto?",
+    "common.confirmDeleteDescription": "Esta ação não pode ser desfeita.",
     
     "risk.status": "Status de Risco",
     "risk.within": "Dentro do limite",
     "risk.approaching": "Próximo ao limite",
     "risk.exceeded": "Limite excedido",
+    "risk.management": "Gestão de Risco",
+    "risk.dailyLimit": "Limite Diário de Risco",
+    "risk.initialCapital": "Capital Inicial",
+    "risk.maxLoss": "Perda Diária Máxima",
+    "risk.warningThreshold": "Limite de Alerta",
     
     "journal.title": "Diário de Trading",
     "journal.description": "Registre suas atividades diárias de trading e reflexões",
@@ -260,6 +298,9 @@ const translations: Record<Language, Record<string, string>> = {
     "journal.previousEntries": "Entradas Anteriores",
     "journal.newEntry": "Nova Entrada no Diário",
     "journal.selectGoalStatus": "Selecione o status da meta",
+    "journal.duplicateEntry": "Você já enviou uma entrada do diário para esta data.",
+    "journal.deleteConfirm": "Excluir Entrada do Diário",
+    "journal.deleteConfirmMessage": "Tem certeza que deseja excluir esta entrada do diário? Esta ação não pode ser desfeita.",
     
     "settings.language": "Idioma",
     "settings.riskManagement": "Gestão de Risco",
@@ -317,6 +358,7 @@ const translations: Record<Language, Record<string, string>> = {
     "trade.goalNotReached": "Meta de hoje não alcançada.",
     "trade.todayPnL": "P&L de Hoje",
     "trade.target": "Meta",
+    "trade.riskManager": "Gerenciador de Risco",
     
     "calculator.title": "Calculadora de Alavancagem",
     "calculator.description": "Calcule a alavancagem ideal com base em seus parâmetros de risco",
@@ -344,6 +386,7 @@ const translations: Record<Language, Record<string, string>> = {
     "analytics.filter": "Filtrar",
     "analytics.reset": "Resetar Filtros",
     "analytics.apply": "Aplicar Filtros",
+    "analytics.traderDetails": "Análise do Trader",
     
     "users.title": "Gerenciamento de Usuários",
     "users.description": "Gerencie traders mentorados e outros mentores",
@@ -366,7 +409,6 @@ const translations: Record<Language, Record<string, string>> = {
     "users.noUsersFound": "Nenhum usuário encontrado",
     "users.accessDenied": "Acesso negado. Apenas mentores podem visualizar esta página.",
     "users.editUser": "Editar Usuário",
-    "users.admin": "Administrador",
     
     "login.title": "Login",
     "login.email": "Email",
@@ -376,7 +418,27 @@ const translations: Record<Language, Record<string, string>> = {
     "login.forgotPassword": "Esqueceu a senha?",
     "login.noAccount": "Não tem uma conta?",
     "login.signUp": "Cadastre-se",
-    "login.switchLanguage": "Mudar para Inglês"
+    "login.switchLanguage": "Mudar para Inglês",
+
+    "dashboard.title": "Painel",
+    "dashboard.description": "Sua performance de trading em um relance",
+    "dashboard.completeJournal": "Completar Diário",
+    "dashboard.logTrade": "Nova Operação",
+    "dashboard.journalRequired": "Diário Diário Necessário",
+    "dashboard.journalRequiredDesc": "Complete seu diário diário antes de operar para melhorar a disciplina e o foco.",
+    "dashboard.goToJournal": "Ir para o Diário",
+    "dashboard.readyToTrade": "Pronto para Começar a Operar",
+    "dashboard.readyToTradeDesc": "Você completou seu diário diário. Agora você pode registrar suas operações.",
+    "dashboard.logFirstTrade": "Registrar Primeira Operação",
+    "dashboard.welcome": "Bem-vindo ao Trade Compass",
+    "dashboard.welcomeDesc": "Seu sistema pessoal de gerenciamento de risco e performance de trading",
+    "dashboard.dashboardDesc": "Este painel exibirá suas análises de trading assim que você começar a registrar operações. Primeiro, complete seu diário diário para definir intenções para o dia.",
+    "dashboard.step1": "Passo 1",
+    "dashboard.step1Desc": "Complete seu diário diário e revisão de erros",
+    "dashboard.step2": "Passo 2",
+    "dashboard.step2Desc": "Registre suas operações com detalhes completos",
+    "dashboard.step3": "Passo 3",
+    "dashboard.step3Desc": "Configure suas configurações de gerenciamento de risco"
   }
 };
 

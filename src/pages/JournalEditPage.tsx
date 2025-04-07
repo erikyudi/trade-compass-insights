@@ -30,6 +30,17 @@ const JournalEditPage: React.FC = () => {
   const handleSubmit = (updatedJournal: Partial<DailyJournal>) => {
     if (!journal) return;
     
+    // Check if there's another journal for the same date (except this one)
+    const sameDate = state.journals.find(j => 
+      j.id !== journal.id && 
+      new Date(j.date).toDateString() === new Date(updatedJournal.date!).toDateString()
+    );
+    
+    if (sameDate) {
+      toast.error(t('journal.duplicateEntry'));
+      return;
+    }
+    
     const updatedData = {
       ...journal,
       ...updatedJournal,

@@ -26,18 +26,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Trash } from 'lucide-react';
 
 const JournalPage: React.FC = () => {
   const { t } = useLanguage();
   const { 
     state: { journals }, 
-    addJournal 
+    addJournal, 
+    deleteTrade: deleteJournal 
   } = useAppContext();
   const navigate = useNavigate();
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [journalToDelete, setJournalToDelete] = useState<string | null>(null);
 
   const handleSubmit = (data: {
     date: Date;
@@ -45,6 +59,16 @@ const JournalPage: React.FC = () => {
     dailyComment: string;
     previousDayGoalHit: "true" | "false" | "na";
   }) => {
+    // Check if there's already a journal for this date
+    const existingEntryForDate = journals.find(journal => 
+      new Date(journal.date).toDateString() === new Date(data.date).toDateString()
+    );
+
+    if (existingEntryForDate) {
+      toast.error(t('journal.duplicateEntry'));
+      return;
+    }
+
     // Convert string values to booleans where needed
     const journalData: Omit<DailyJournal, 'id' | 'createdAt'> = {
       date: data.date,
@@ -60,6 +84,15 @@ const JournalPage: React.FC = () => {
     addJournal(journalData);
     toast.success(t('journal.submitted'));
     navigate('/');
+  };
+
+  // Handle journal deletion
+  const handleDeleteJournal = () => {
+    if (journalToDelete) {
+      deleteJournal(journalToDelete);
+      setJournalToDelete(null);
+      toast.success(t('common.delete'));
+    }
   };
 
   // Sort journals by date (newest first)
@@ -167,8 +200,14 @@ const JournalPage: React.FC = () => {
         <p className="text-muted-foreground">{t('journal.entriesDescription')}</p>
       </div>
 
+      <div>
+        <h2 className="text-xl font-semibold mb-4">{t('journal.newEntry')}</h2>
+        <DailyJournalForm onSubmit={handleSubmit} />
+      </div>
+
       {sortedJournals.length > 0 && (
         <>
+          <Separator />
           <Card>
             <CardContent className="p-6">
               <div className="flex justify-between items-center mb-4">
@@ -216,6 +255,35 @@ const JournalPage: React.FC = () => {
                       >
                         {t('common.edit')}
                       </Button>
+                      <AlertDialog open={journalToDelete === journal.id} onOpenChange={(open) => !open && setJournalToDelete(null)}>
+                        <AlertDialogTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="text-red-500 border-red-200 hover:bg-red-50"
+                            onClick={() => setJournalToDelete(journal.id)}
+                          >
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>{t('journal.deleteConfirm')}</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              {t('journal.deleteConfirmMessage')}
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={handleDeleteJournal}
+                              className="bg-red-500 text-white hover:bg-red-600"
+                            >
+                              {t('common.delete')}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </div>
                 ))}
@@ -244,14 +312,8 @@ const JournalPage: React.FC = () => {
               )}
             </CardContent>
           </Card>
-          <Separator />
         </>
       )}
-
-      <div>
-        <h2 className="text-xl font-semibold mb-4">{t('journal.newEntry')}</h2>
-        <DailyJournalForm onSubmit={handleSubmit} />
-      </div>
     </div>
   );
 };
