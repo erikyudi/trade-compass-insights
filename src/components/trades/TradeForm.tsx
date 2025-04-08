@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -366,9 +365,9 @@ const TradeForm: React.FC<TradeFormProps> = ({
                       <Input 
                         type="text"
                         placeholder="0.00"
-                        value={field.value}
+                        value={field.value.toString()}
                         onChange={(e) => {
-                          // Only allow numbers and minus sign
+                          // Only allow numbers, decimal point and minus sign
                           const value = e.target.value;
                           if (/^-?\d*\.?\d*$/.test(value)) {
                             field.onChange(value === '' ? 0 : parseFloat(value));

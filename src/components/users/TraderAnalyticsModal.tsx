@@ -1,8 +1,6 @@
 
 import React from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import TraderAnalytics from '@/components/users/TraderAnalytics';
 import { User } from '@/types';
@@ -26,11 +24,8 @@ const TraderAnalyticsModal: React.FC<TraderAnalyticsModalProps> = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <span>{t('users.analyticsFor')} {user.name}</span>
-            <Button variant="ghost" size="icon" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
+          <DialogTitle>
+            {t('users.analyticsFor')} {user.name}
           </DialogTitle>
           <DialogDescription>
             {t('users.analyticsDescription')}

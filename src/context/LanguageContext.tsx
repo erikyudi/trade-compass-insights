@@ -197,7 +197,6 @@ const translations: Record<Language, Record<string, string>> = {
     "users.accessDenied": "Access denied. Only mentors can view this page.",
     "users.editUser": "Edit User",
     "users.addUser": "Add User",
-    "users.mentor": "Mentor",
     "users.assignMentor": "Assign Mentor",
     "users.selectMentor": "Select Mentor",
     "users.saveChanges": "Save Changes",
@@ -234,7 +233,8 @@ const translations: Record<Language, Record<string, string>> = {
     "dashboard.step2": "Step 2",
     "dashboard.step2Desc": "Log your trades with complete details",
     "dashboard.step3": "Step 3",
-    "dashboard.step3Desc": "Configure your risk management settings"
+    "dashboard.step3Desc": "Configure your risk management settings",
+    "trade.profitLossDescription": "Enter percentage gain/loss (use minus sign for losses)"
   },
   "pt-BR": {
     "app.title": "MyTradingMind",
@@ -418,7 +418,6 @@ const translations: Record<Language, Record<string, string>> = {
     "users.accessDenied": "Acesso negado. Apenas mentores podem visualizar esta página.",
     "users.editUser": "Editar Usuário",
     "users.addUser": "Adicionar Usuário",
-    "users.mentor": "Mentor",
     "users.assignMentor": "Atribuir Mentor",
     "users.selectMentor": "Selecionar Mentor",
     "users.saveChanges": "Salvar Alterações",
@@ -455,7 +454,8 @@ const translations: Record<Language, Record<string, string>> = {
     "dashboard.step2": "Passo 2",
     "dashboard.step2Desc": "Registre suas operações com detalhes completos",
     "dashboard.step3": "Passo 3",
-    "dashboard.step3Desc": "Configure suas configurações de gerenciamento de risco"
+    "dashboard.step3Desc": "Configure suas configurações de gerenciamento de risco",
+    "trade.profitLossDescription": "Digite o ganho/perda percentual (use sinal de menos para perdas)"
   }
 };
 
