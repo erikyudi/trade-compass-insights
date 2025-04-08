@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 // Define language types
@@ -197,7 +196,16 @@ const translations: Record<Language, Record<string, string>> = {
     "users.noUsersFound": "No users found",
     "users.accessDenied": "Access denied. Only mentors can view this page.",
     "users.editUser": "Edit User",
-    
+    "users.addUser": "Add User",
+    "users.mentor": "Mentor",
+    "users.assignMentor": "Assign Mentor",
+    "users.selectMentor": "Select Mentor",
+    "users.saveChanges": "Save Changes",
+    "users.createUser": "Create User",
+    "users.emailNote": "This email will be used for login and notifications",
+    "users.selectRole": "Select a role",
+    "users.analyticsFor": "Analytics for",
+    "users.analyticsDescription": "View detailed trading performance metrics",
     "login.title": "Login",
     "login.email": "Email",
     "login.password": "Password",
@@ -409,7 +417,16 @@ const translations: Record<Language, Record<string, string>> = {
     "users.noUsersFound": "Nenhum usuário encontrado",
     "users.accessDenied": "Acesso negado. Apenas mentores podem visualizar esta página.",
     "users.editUser": "Editar Usuário",
-    
+    "users.addUser": "Adicionar Usuário",
+    "users.mentor": "Mentor",
+    "users.assignMentor": "Atribuir Mentor",
+    "users.selectMentor": "Selecionar Mentor",
+    "users.saveChanges": "Salvar Alterações",
+    "users.createUser": "Criar Usuário",
+    "users.emailNote": "Este e-mail será usado para login e notificações",
+    "users.selectRole": "Selecione uma função",
+    "users.analyticsFor": "Análises para",
+    "users.analyticsDescription": "Veja métricas detalhadas de desempenho de trading",
     "login.title": "Login",
     "login.email": "Email",
     "login.password": "Senha",

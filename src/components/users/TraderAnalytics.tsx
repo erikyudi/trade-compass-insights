@@ -13,7 +13,6 @@ const TraderAnalytics: React.FC<TraderAnalyticsProps> = ({ userId }) => {
   // In a real application, this data would be fetched from an API
   // using the userId parameter
   const traderData = {
-    name: 'Trader',
     profitLoss: '$1,245',
     winRate: '65%',
     tradeCount: 42,
@@ -61,17 +60,6 @@ const TraderAnalytics: React.FC<TraderAnalyticsProps> = ({ userId }) => {
               </CardContent>
             </Card>
           </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Monthly Performance</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                Performance chart would be displayed here
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </CardContent>
     </Card>

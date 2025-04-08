@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { ArrowDown, ArrowUp, Edit, Trash, TrendingDown, TrendingUp } from 'lucide-react';
@@ -208,9 +207,16 @@ const TradeList: React.FC<TradeListProps> = ({ onEdit }) => {
                             {getMistakeTypeName(trade.mistakeTypeId)}
                           </Badge>
                         )}
-                        <Badge variant="outline" className="bg-gray-50">
-                          {trade.trendPosition === 'With' ? 'With Trend' : 'Against Trend'}
-                        </Badge>
+                        {trade.trendPosition && (
+                          <Badge 
+                            variant="outline" 
+                            className={trade.trendPosition === 'With' 
+                              ? 'bg-green-50 text-green-700 font-medium' 
+                              : 'bg-red-50 text-red-700 font-medium'}
+                          >
+                            {trade.trendPosition === 'With' ? 'With Trend' : 'Against Trend'}
+                          </Badge>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">

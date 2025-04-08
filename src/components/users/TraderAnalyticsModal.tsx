@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
@@ -28,11 +28,9 @@ const TraderAnalyticsModal: React.FC<TraderAnalyticsModalProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>{t('users.analyticsFor')} {user.name}</span>
-            <DialogClose asChild>
-              <Button variant="ghost" size="icon" onClick={onClose}>
-                <X className="h-4 w-4" />
-              </Button>
-            </DialogClose>
+            <Button variant="ghost" size="icon" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
           </DialogTitle>
           <DialogDescription>
             {t('users.analyticsDescription')}
