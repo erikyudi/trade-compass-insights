@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -56,7 +57,7 @@ const formSchema = z.object({
   profitLossPercentage: z.number({ 
     required_error: 'Profit/loss is required',
     invalid_type_error: 'Must be a number'
-  }),
+  }).optional(),
   leverage: z.number({ 
     required_error: 'Leverage is required',
     invalid_type_error: 'Must be a number'
@@ -91,7 +92,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
     trendPosition: 'With' as const,
     entryTime: new Date(),
     exitTime: undefined, // Default to undefined (no exit time)
-    profitLossPercentage: 0,
+    profitLossPercentage: undefined, // Empty by default
     leverage: 1,
     notes: '',
     isMistake: false,
@@ -105,7 +106,6 @@ const TradeForm: React.FC<TradeFormProps> = ({
   });
   
   const isMistake = form.watch('isMistake');
-  const exitTime = form.watch('exitTime');
   
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     if (!hasDailyJournal()) {
@@ -115,7 +115,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
       return;
     }
     
-    if (!checkRiskLimit() && values.profitLossPercentage < 0) {
+    if (!checkRiskLimit() && values.profitLossPercentage && values.profitLossPercentage < 0) {
       toast.error('Risk limit exceeded', {
         description: 'You have exceeded your daily risk limit. Be cautious about taking additional trades.'
       });
@@ -124,7 +124,8 @@ const TradeForm: React.FC<TradeFormProps> = ({
     // Set financialResult based on profitLossPercentage for backward compatibility
     const tradeData = {
       ...values,
-      financialResult: values.profitLossPercentage
+      profitLossPercentage: values.profitLossPercentage || 0,
+      financialResult: values.profitLossPercentage || 0
     };
     
     onSubmit(tradeData);
@@ -365,12 +366,12 @@ const TradeForm: React.FC<TradeFormProps> = ({
                       <Input 
                         type="text"
                         placeholder="0.00"
-                        value={field.value.toString()}
+                        value={field.value === undefined ? '' : field.value.toString()}
                         onChange={(e) => {
-                          // Only allow numbers, decimal point and minus sign
                           const value = e.target.value;
-                          if (/^-?\d*\.?\d*$/.test(value)) {
-                            field.onChange(value === '' ? 0 : parseFloat(value));
+                          // Accept empty string, minus sign alone, and valid numbers with optional minus sign
+                          if (value === '' || value === '-' || /^-?\d*\.?\d*$/.test(value)) {
+                            field.onChange(value === '' || value === '-' ? undefined : parseFloat(value));
                           }
                         }}
                       />

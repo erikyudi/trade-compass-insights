@@ -46,8 +46,6 @@ const AnalyticsPage: React.FC = () => {
   };
   
   const applyFilter = () => {
-    // Pass filter to Dashboard component
-    // For now, we just show selected dates for demonstration
     console.log('Applied filter:', filterType === 'month' 
       ? { month: currentMonth } 
       : { startDate, endDate });

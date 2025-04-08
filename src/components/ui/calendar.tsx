@@ -90,7 +90,7 @@ function Calendar({
           const customClass = getDayClassName(props.date);
           return (
             <div className={`h-full w-full flex items-center justify-center ${customClass}`}>
-              <span className="inline-block">{props.date.getDate()}</span>
+              <span className="inline-block text-center">{props.date.getDate()}</span>
             </div>
           );
         },

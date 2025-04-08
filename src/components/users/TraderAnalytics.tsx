@@ -10,8 +10,7 @@ interface TraderAnalyticsProps {
 const TraderAnalytics: React.FC<TraderAnalyticsProps> = ({ userId }) => {
   const { t } = useLanguage();
 
-  // In a real application, this data would be fetched from an API
-  // using the userId parameter
+  // Mock data for the trader
   const traderData = {
     profitLoss: '$1,245',
     winRate: '65%',
