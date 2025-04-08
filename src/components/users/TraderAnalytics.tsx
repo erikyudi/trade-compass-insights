@@ -1,26 +1,29 @@
 
 import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
-import { User } from '@/context/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
 
 interface TraderAnalyticsProps {
-  trader: User;
-  onClose: () => void;
+  userId: string;
 }
 
-const TraderAnalytics: React.FC<TraderAnalyticsProps> = ({ trader, onClose }) => {
+const TraderAnalytics: React.FC<TraderAnalyticsProps> = ({ userId }) => {
   const { t } = useLanguage();
+
+  // In a real application, this data would be fetched from an API
+  // using the userId parameter
+  const traderData = {
+    name: 'Trader',
+    profitLoss: '$1,245',
+    winRate: '65%',
+    tradeCount: 42,
+    averageTrade: '$29.64'
+  };
 
   return (
     <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>{t('analytics.traderDetails')}: {trader.name}</CardTitle>
-        <Button variant="ghost" size="icon" onClick={onClose}>
-          <X className="h-4 w-4" />
-        </Button>
+      <CardHeader>
+        <CardTitle>{t('analytics.traderDetails')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
@@ -28,7 +31,7 @@ const TraderAnalytics: React.FC<TraderAnalyticsProps> = ({ trader, onClose }) =>
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <div className="text-2xl font-bold">$1,245</div>
+                  <div className="text-2xl font-bold">{traderData.profitLoss}</div>
                   <p className="text-xs text-muted-foreground">{t('analytics.profitLoss')}</p>
                 </div>
               </CardContent>
@@ -36,7 +39,7 @@ const TraderAnalytics: React.FC<TraderAnalyticsProps> = ({ trader, onClose }) =>
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <div className="text-2xl font-bold">65%</div>
+                  <div className="text-2xl font-bold">{traderData.winRate}</div>
                   <p className="text-xs text-muted-foreground">{t('analytics.winRate')}</p>
                 </div>
               </CardContent>
@@ -44,7 +47,7 @@ const TraderAnalytics: React.FC<TraderAnalyticsProps> = ({ trader, onClose }) =>
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <div className="text-2xl font-bold">42</div>
+                  <div className="text-2xl font-bold">{traderData.tradeCount}</div>
                   <p className="text-xs text-muted-foreground">{t('analytics.tradeCount')}</p>
                 </div>
               </CardContent>
@@ -52,7 +55,7 @@ const TraderAnalytics: React.FC<TraderAnalyticsProps> = ({ trader, onClose }) =>
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <div className="text-2xl font-bold">$29.64</div>
+                  <div className="text-2xl font-bold">{traderData.averageTrade}</div>
                   <p className="text-xs text-muted-foreground">{t('analytics.averageTrade')}</p>
                 </div>
               </CardContent>
