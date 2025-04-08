@@ -173,7 +173,10 @@ const TradeList: React.FC<TradeListProps> = ({ onEdit }) => {
                     <TableCell className="font-medium">{trade.asset}</TableCell>
                     <TableCell>{getSetupName(trade.setupId)}</TableCell>
                     <TableCell>
-                      <Badge variant={trade.direction === 'Buy' ? 'default' : 'destructive'}>
+                      <Badge 
+                        variant={trade.direction === 'Buy' ? 'default' : 'destructive'}
+                        className={trade.direction === 'Buy' ? 'bg-green-500 hover:bg-green-600' : ''}
+                      >
                         {trade.direction}
                       </Badge>
                     </TableCell>

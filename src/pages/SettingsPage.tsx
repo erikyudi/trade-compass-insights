@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { 
-  Shield, 
   Shapes, 
   AlertTriangle, 
   Banknote, 
@@ -22,7 +21,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import RiskSettingsForm from '@/components/settings/RiskSettingsForm';
 import TradingSetupList from '@/components/settings/TradingSetupList';
 import MistakeTypeList from '@/components/settings/MistakeTypeList';
 import AssetList from '@/components/settings/AssetList';
@@ -72,12 +70,8 @@ const SettingsPage: React.FC = () => {
         </CardContent>
       </Card>
       
-      <Tabs defaultValue="risk" className="space-y-4">
+      <Tabs defaultValue="setups" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="risk" className="flex items-center gap-1">
-            <Shield className="h-4 w-4" />
-            <span>{t('settings.riskManagement')}</span>
-          </TabsTrigger>
           <TabsTrigger value="setups" className="flex items-center gap-1">
             <Shapes className="h-4 w-4" />
             <span>{t('settings.tradingSetups')}</span>
@@ -91,10 +85,6 @@ const SettingsPage: React.FC = () => {
             <span>{t('settings.assets')}</span>
           </TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="risk" className="space-y-4">
-          <RiskSettingsForm />
-        </TabsContent>
         
         <TabsContent value="setups" className="space-y-4">
           <TradingSetupList />

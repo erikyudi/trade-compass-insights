@@ -7,11 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { Plus, Pencil, Trash, Search, ExternalLink } from 'lucide-react';
+import { Plus, Pencil, Trash, Search, BarChart } from 'lucide-react';
 import { User, UserRole } from '@/types';
 import { toast } from 'sonner';
 import UserForm from '@/components/users/UserForm';
-import { Link } from 'react-router-dom';
+import TraderAnalyticsModal from '@/components/users/TraderAnalyticsModal';
 
 // Mock users data - in a real app this would come from an API
 const MOCK_USERS: User[] = [
@@ -55,6 +55,8 @@ const UsersPage: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [selectedUserForAnalytics, setSelectedUserForAnalytics] = useState<User | null>(null);
+  const [isAnalyticsModalOpen, setIsAnalyticsModalOpen] = useState(false);
 
   // Use admin role for demo purposes when testing
   const currentUserRole = user?.role || 'admin';
@@ -131,6 +133,12 @@ const UsersPage: React.FC = () => {
   // Check if current user can delete users (only admin)
   const canDelete = () => {
     return currentUserRole === 'admin';
+  };
+
+  // Handle opening the analytics modal
+  const handleViewAnalytics = (selectedUser: User) => {
+    setSelectedUserForAnalytics(selectedUser);
+    setIsAnalyticsModalOpen(true);
   };
 
   return (
@@ -243,17 +251,15 @@ const UsersPage: React.FC = () => {
                               <Trash className="h-4 w-4 text-red-400" />
                             </Button>
                           )}
-                          {/* Directly to analytics page instead of blank page */}
+                          {/* Open analytics in modal instead of redirect */}
                           {(userItem.role === 'mentored' || currentUserRole === 'admin') && (
                             <Button
                               variant="outline"
                               size="sm"
-                              asChild
+                              onClick={() => handleViewAnalytics(userItem)}
                               className="border-gray-600 hover:bg-gray-700"
                             >
-                              <Link to={`/analytics?userId=${userItem.id}`}>
-                                <ExternalLink className="h-4 w-4 text-blue-400" />
-                              </Link>
+                              <BarChart className="h-4 w-4 text-blue-400" />
                             </Button>
                           )}
                         </div>
@@ -266,6 +272,16 @@ const UsersPage: React.FC = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Trader Analytics Modal */}
+      <TraderAnalyticsModal
+        user={selectedUserForAnalytics}
+        isOpen={isAnalyticsModalOpen}
+        onClose={() => {
+          setIsAnalyticsModalOpen(false);
+          setSelectedUserForAnalytics(null);
+        }}
+      />
     </div>
   );
 };

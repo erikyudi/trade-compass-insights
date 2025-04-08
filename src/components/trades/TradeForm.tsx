@@ -42,7 +42,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import SearchableAssetSelect from './SearchableAssetSelect';
 
-// Modify the schema to make exitTime optional
+// Modify the schema to make exitTime optional and remove financialResult
 const formSchema = z.object({
   asset: z.string().min(1, { message: 'Asset symbol is required' }),
   setupId: z.string().min(1, { message: 'Setup is required' }),
@@ -54,12 +54,8 @@ const formSchema = z.object({
   }),
   entryTime: z.date({ required_error: 'Entry time is required' }),
   exitTime: z.date().optional(), // Make exitTime optional
-  financialResult: z.number({ 
-    required_error: 'Financial result is required',
-    invalid_type_error: 'Must be a number'
-  }),
   profitLossPercentage: z.number({ 
-    required_error: 'Profit/loss percentage is required',
+    required_error: 'Profit/loss is required',
     invalid_type_error: 'Must be a number'
   }),
   leverage: z.number({ 
@@ -96,7 +92,6 @@ const TradeForm: React.FC<TradeFormProps> = ({
     trendPosition: 'With' as const,
     entryTime: new Date(),
     exitTime: undefined, // Default to undefined (no exit time)
-    financialResult: 0,
     profitLossPercentage: 0,
     leverage: 1,
     notes: '',
@@ -121,13 +116,19 @@ const TradeForm: React.FC<TradeFormProps> = ({
       return;
     }
     
-    if (!checkRiskLimit() && values.financialResult < 0) {
+    if (!checkRiskLimit() && values.profitLossPercentage < 0) {
       toast.error('Risk limit exceeded', {
         description: 'You have exceeded your daily risk limit. Be cautious about taking additional trades.'
       });
     }
     
-    onSubmit(values);
+    // Set financialResult based on profitLossPercentage for backward compatibility
+    const tradeData = {
+      ...values,
+      financialResult: values.profitLossPercentage
+    };
+    
+    onSubmit(tradeData);
   };
 
   return (
@@ -354,28 +355,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                 )}
               />
               
-              {/* Financial Result */}
-              <FormField
-                control={form.control}
-                name="financialResult"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('trade.financialResult')}</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.01"
-                        placeholder="0.00"
-                        {...field}
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              {/* Profit/Loss Percentage */}
+              {/* Profit/Loss - Allow negative values */}
               <FormField
                 control={form.control}
                 name="profitLossPercentage"
@@ -384,13 +364,21 @@ const TradeForm: React.FC<TradeFormProps> = ({
                     <FormLabel>{t('trade.profitLoss')}</FormLabel>
                     <FormControl>
                       <Input 
-                        type="number" 
-                        step="0.01"
+                        type="text"
                         placeholder="0.00"
-                        {...field} 
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                        value={field.value}
+                        onChange={(e) => {
+                          // Only allow numbers and minus sign
+                          const value = e.target.value;
+                          if (/^-?\d*\.?\d*$/.test(value)) {
+                            field.onChange(value === '' ? 0 : parseFloat(value));
+                          }
+                        }}
                       />
                     </FormControl>
+                    <FormDescription>
+                      {t('trade.profitLossDescription')}
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
