@@ -68,15 +68,15 @@ const RiskSettingsForm: React.FC = () => {
     };
     
     updateRiskSettings(updatedSettings);
-    toast.success(t('settings.riskUpdated', 'Risk settings updated'));
+    toast.success(t('risk.managementUpdated'));
   };
 
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader>
-        <CardTitle>{t('risk.management', 'Risk Management Settings')}</CardTitle>
+        <CardTitle>{t('risk.management')}</CardTitle>
         <CardDescription>
-          {t('risk.description', 'Configure your risk parameters to maintain discipline in your trading')}
+          {t('risk.description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -87,7 +87,7 @@ const RiskSettingsForm: React.FC = () => {
               name="initialCapital"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('risk.initialCapital', 'Initial Capital ($)')}</FormLabel>
+                  <FormLabel>{t('risk.initialCapital')}</FormLabel>
                   <FormControl>
                     <Input 
                       type="number" 
@@ -99,7 +99,7 @@ const RiskSettingsForm: React.FC = () => {
                     />
                   </FormControl>
                   <FormDescription>
-                    {t('risk.initialCapitalDesc', 'Your trading account starting balance')}
+                    {t('risk.initialCapitalDesc')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -111,7 +111,7 @@ const RiskSettingsForm: React.FC = () => {
               name="dailyProfitTarget"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('risk.dailyProfit', 'Daily Profit Target (%)')}</FormLabel>
+                  <FormLabel>{t('risk.dailyProfit')}</FormLabel>
                   <FormControl>
                     <Input 
                       type="number" 
@@ -123,7 +123,7 @@ const RiskSettingsForm: React.FC = () => {
                     />
                   </FormControl>
                   <FormDescription>
-                    {t('risk.dailyProfitDesc', 'Your target daily profit as a percentage of initial capital')}
+                    {t('risk.dailyProfitDesc')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -135,7 +135,7 @@ const RiskSettingsForm: React.FC = () => {
               name="maxDailyRisk"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('risk.maxDailyRisk', 'Maximum Daily Risk (%)')}</FormLabel>
+                  <FormLabel>{t('risk.maxDailyRisk')}</FormLabel>
                   <FormControl>
                     <Input 
                       type="number" 
@@ -147,7 +147,7 @@ const RiskSettingsForm: React.FC = () => {
                     />
                   </FormControl>
                   <FormDescription>
-                    {t('risk.maxDailyRiskDesc', 'The maximum percentage of your capital you\'re willing to risk in a single day')}
+                    {t('risk.maxDailyRiskDesc')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -156,7 +156,7 @@ const RiskSettingsForm: React.FC = () => {
             
             <CardFooter className="flex justify-end px-0">
               <Button type="submit">
-                {t('settings.save', 'Save Risk Settings')}
+                {t('settings.save')}
               </Button>
             </CardFooter>
           </form>

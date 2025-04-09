@@ -19,16 +19,16 @@ const SettingsPage = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t('settings.title', 'Settings')}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t('settings.title')}</h1>
         <p className="text-muted-foreground">
-          {t('settings.description', 'Manage your application settings')}
+          {t('settings.description')}
         </p>
       </div>
       
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>{t('settings.language', 'Language')}</CardTitle>
-          <CardDescription>{t('settings.languageDescription', 'Choose your preferred language')}</CardDescription>
+          <CardTitle>{t('settings.language')}</CardTitle>
+          <CardDescription>{t('settings.languageDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Select 
@@ -36,7 +36,7 @@ const SettingsPage = () => {
             onValueChange={setLanguage}
           >
             <SelectTrigger className="w-full max-w-xs">
-              <SelectValue placeholder={t('settings.selectLanguage', 'Select language')} />
+              <SelectValue placeholder={t('settings.selectLanguage')} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="en">English</SelectItem>
@@ -52,17 +52,17 @@ const SettingsPage = () => {
         onValueChange={handleTabChange}
       >
         <TabsList className="mb-4">
-          <TabsTrigger value="assets">{t('settings.assets', 'Assets')}</TabsTrigger>
-          <TabsTrigger value="setups">{t('settings.setups', 'Setups')}</TabsTrigger>
-          <TabsTrigger value="mistakes">{t('settings.mistakes', 'Mistakes')}</TabsTrigger>
+          <TabsTrigger value="assets">{t('settings.assets')}</TabsTrigger>
+          <TabsTrigger value="setups">{t('settings.setups')}</TabsTrigger>
+          <TabsTrigger value="mistakes">{t('settings.mistakes')}</TabsTrigger>
         </TabsList>
         
         <TabsContent value="assets">
           <Card>
             <CardHeader>
-              <CardTitle>{t('settings.assets', 'Assets')}</CardTitle>
+              <CardTitle>{t('settings.assets')}</CardTitle>
               <CardDescription>
-                {t('settings.assetsDescription', 'Manage trading assets and markets')}
+                {t('settings.assetsDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -74,9 +74,9 @@ const SettingsPage = () => {
         <TabsContent value="setups">
           <Card>
             <CardHeader>
-              <CardTitle>{t('settings.setups', 'Setups')}</CardTitle>
+              <CardTitle>{t('settings.setups')}</CardTitle>
               <CardDescription>
-                {t('settings.setupsDescription', 'Manage your trading strategies and setups')}
+                {t('settings.setupsDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -88,9 +88,9 @@ const SettingsPage = () => {
         <TabsContent value="mistakes">
           <Card>
             <CardHeader>
-              <CardTitle>{t('settings.mistakes', 'Mistakes')}</CardTitle>
+              <CardTitle>{t('settings.mistakes')}</CardTitle>
               <CardDescription>
-                {t('settings.mistakesDescription', 'Track and categorize common trading mistakes')}
+                {t('settings.mistakesDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
