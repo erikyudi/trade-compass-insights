@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -26,6 +26,11 @@ const TraderAnalytics: React.FC<TraderAnalyticsProps> = ({ userId }) => {
   const [startDate, setStartDate] = useState<Date>(startOfMonth(new Date()));
   const [endDate, setEndDate] = useState<Date>(endOfMonth(new Date()));
   const [dateRangeApplied, setDateRangeApplied] = useState(false);
+
+  // Auto-apply filter when first loading the component
+  useEffect(() => {
+    applyFilter();
+  }, []);
 
   // Filter user data by userId
   const userData = {

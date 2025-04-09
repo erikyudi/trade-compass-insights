@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, addMonths, subMonths, startOfDay, endOfDay } from 'date-fns';
 import { useLanguage } from '@/context/LanguageContext';
 import Dashboard from '@/components/dashboard/Dashboard';
@@ -29,6 +29,11 @@ const AnalyticsPage: React.FC = () => {
   const [startDate, setStartDate] = useState<Date>(startOfMonth(new Date()));
   const [endDate, setEndDate] = useState<Date>(endOfMonth(new Date()));
   const [dateRangeApplied, setDateRangeApplied] = useState(false);
+  
+  // Auto-apply filter when first loading the page
+  useEffect(() => {
+    applyFilter();
+  }, []);
   
   const handlePreviousMonth = () => {
     setCurrentMonth(subMonths(currentMonth, 1));

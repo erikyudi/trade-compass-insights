@@ -13,15 +13,15 @@ import {
   PieChart,
   Pie,
   Cell,
-  Legend
+  Legend,
+  ReferenceLine
 } from 'recharts';
-import { format, subDays, startOfDay, endOfDay, isWithinInterval } from 'date-fns';
+import { format, isWithinInterval } from 'date-fns';
 import { useAppContext } from '@/context/AppContext';
 import { Trade } from '@/types';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -75,20 +75,32 @@ const Dashboard: React.FC<DashboardProps> = ({
   const winRate = filteredTrades.length > 0 ? (winCount / filteredTrades.length * 100).toFixed(1) : '0.0';
   const mistakeCount = filteredTrades.filter(trade => trade.isMistake).length;
   
-  // Data for setup performance
+  // Data for setup performance - IMPROVED VERSION
   const setupPerformance = setups.map(setup => {
     const setupTrades = filteredTrades.filter(trade => trade.setupId === setup.id);
-    const setupProfit = setupTrades.reduce((sum, trade) => sum + trade.financialResult, 0);
-    const setupWins = setupTrades.filter(trade => trade.financialResult > 0).length;
-    const setupWinRate = setupTrades.length > 0 ? (setupWins / setupTrades.length * 100) : 0;
+    
+    const winningTrades = setupTrades.filter(trade => trade.financialResult > 0);
+    const losingTrades = setupTrades.filter(trade => trade.financialResult <= 0);
+    
+    const totalProfit = winningTrades.reduce((sum, trade) => sum + trade.financialResult, 0);
+    const totalLoss = losingTrades.reduce((sum, trade) => sum + trade.financialResult, 0);
+    
+    const setupWinRate = setupTrades.length > 0 
+      ? (winningTrades.length / setupTrades.length * 100) 
+      : 0;
     
     return {
       name: setup.name,
-      profit: setupProfit,
+      profit: totalProfit,
+      loss: Math.abs(totalLoss), // Store as positive value for display purposes
+      actualLoss: totalLoss,     // Store actual negative value for calculations
       trades: setupTrades.length,
-      winRate: setupWinRate
+      winRate: setupWinRate,
+      winCount: winningTrades.length,
+      lossCount: losingTrades.length
     };
-  }).sort((a, b) => b.profit - a.profit);
+  }).filter(setup => setup.trades > 0) // Only show setups with trades
+    .sort((a, b) => (b.profit - b.loss) - (a.profit - a.loss)); // Sort by net profit
   
   // Data for profit by day
   interface DailyProfit {
@@ -170,13 +182,34 @@ const Dashboard: React.FC<DashboardProps> = ({
     }).format(value);
   };
   
+  // Custom tooltip for the setup performance chart
+  const SetupPerformanceTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      const setupData = payload[0].payload;
+      
+      return (
+        <div className="bg-background border border-input p-3 rounded-md shadow-md">
+          <p className="font-medium">{`Setup: ${label}`}</p>
+          <p className="text-profit">{`Profit: ${formatCurrency(setupData.profit)}`}</p>
+          <p className="text-loss">{`Loss: ${formatCurrency(-setupData.loss)}`}</p>
+          <p>{`Net: ${formatCurrency(setupData.profit + setupData.actualLoss)}`}</p>
+          <p>{`Win Rate: ${setupData.winRate.toFixed(1)}%`}</p>
+          <p>{`Wins/Losses: ${setupData.winCount}/${setupData.lossCount}`}</p>
+          <p>{`Total Trades: ${setupData.trades}`}</p>
+        </div>
+      );
+    }
+    
+    return null;
+  };
+  
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Total P&L</CardTitle>
-            <CardDescription>Overall performance</CardDescription>
+            <CardTitle className="text-lg">{t('analytics.totalPnL')}</CardTitle>
+            <CardDescription>{t('analytics.overallPerformance')}</CardDescription>
           </CardHeader>
           <CardContent>
             <p className={`text-3xl font-bold ${totalProfitLoss >= 0 ? 'text-profit' : 'text-loss'}`}>
@@ -187,34 +220,34 @@ const Dashboard: React.FC<DashboardProps> = ({
         
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Win Rate</CardTitle>
-            <CardDescription>Percentage of winning trades</CardDescription>
+            <CardTitle className="text-lg">{t('analytics.winRate')}</CardTitle>
+            <CardDescription>{t('analytics.winRateDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{winRate}%</p>
             <p className="text-sm text-muted-foreground">
-              ({winCount}/{filteredTrades.length} trades)
+              ({winCount}/{filteredTrades.length} {t('analytics.trades')})
             </p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Mistake Count</CardTitle>
-            <CardDescription>Number of mistake trades</CardDescription>
+            <CardTitle className="text-lg">{t('analytics.mistakeCount')}</CardTitle>
+            <CardDescription>{t('analytics.mistakeDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{mistakeCount}</p>
             <p className="text-sm text-muted-foreground">
-              ({(mistakeCount / (filteredTrades.length || 1) * 100).toFixed(1)}% of trades)
+              ({(mistakeCount / (filteredTrades.length || 1) * 100).toFixed(1)}% {t('analytics.ofTrades')})
             </p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Leverage</CardTitle>
-            <CardDescription>Average leverage used</CardDescription>
+            <CardTitle className="text-lg">{t('analytics.leverage')}</CardTitle>
+            <CardDescription>{t('analytics.leverageDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">
@@ -236,9 +269,9 @@ const Dashboard: React.FC<DashboardProps> = ({
         <TabsContent value="profit" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Profit/Loss Trend {dateRangeDisplay}</CardTitle>
+              <CardTitle>{t('analytics.profitLossTrend')} {dateRangeDisplay}</CardTitle>
               <CardDescription>
-                Daily P&L for the selected time period
+                {t('analytics.dailyPnL')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -257,7 +290,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     <XAxis dataKey="date" />
                     <YAxis tickFormatter={(value) => `$${value}`} />
                     <Tooltip 
-                      formatter={(value) => [`${formatCurrency(value as number)}`, 'Profit/Loss']}
+                      formatter={(value) => [`${formatCurrency(value as number)}`, t('analytics.profitLoss')]}
                     />
                     <Line
                       type="monotone"
@@ -273,9 +306,9 @@ const Dashboard: React.FC<DashboardProps> = ({
           
           <Card>
             <CardHeader>
-              <CardTitle>Win/Loss Distribution</CardTitle>
+              <CardTitle>{t('analytics.winLossDistribution')}</CardTitle>
               <CardDescription>
-                Breakdown of winning and losing trades
+                {t('analytics.winLossDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -297,7 +330,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       ))}
                     </Pie>
                     <Legend />
-                    <Tooltip formatter={(value) => [`${value} trades`, '']} />
+                    <Tooltip formatter={(value) => [`${value} ${t('analytics.trades')}`, '']} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -308,9 +341,9 @@ const Dashboard: React.FC<DashboardProps> = ({
         <TabsContent value="setup">
           <Card>
             <CardHeader>
-              <CardTitle>Setup Performance {dateRangeDisplay}</CardTitle>
+              <CardTitle>{t('analytics.setupPerformance')} {dateRangeDisplay}</CardTitle>
               <CardDescription>
-                Profit/loss by trading setup
+                {t('analytics.setupDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -319,7 +352,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <BarChart
                     data={setupPerformance}
                     margin={{
-                      top: 5,
+                      top: 20,
                       right: 30,
                       left: 20,
                       bottom: 5,
@@ -327,20 +360,19 @@ const Dashboard: React.FC<DashboardProps> = ({
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
-                    <YAxis yAxisId="left" orientation="left" stroke="#8884d8" tickFormatter={(value) => `$${value}`} />
-                    <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" tickFormatter={(value) => `${value}%`} />
-                    <Tooltip
-                      formatter={(value, name) => {
-                        if (name === 'profit') return [formatCurrency(value as number), 'Profit/Loss'];
-                        if (name === 'winRate') return [`${value}%`, 'Win Rate'];
-                        return [value, name];
-                      }}
-                    />
+                    <YAxis tickFormatter={(value) => `$${value}`} />
+                    <ReferenceLine y={0} stroke="#000" />
+                    <Tooltip content={<SetupPerformanceTooltip />} />
                     <Legend />
-                    <Bar yAxisId="left" dataKey="profit" name="Profit/Loss" fill="#8884d8" />
-                    <Bar yAxisId="right" dataKey="winRate" name="Win Rate %" fill="#82ca9d" />
+                    <Bar dataKey="profit" name={t('analytics.profit')} fill="#38A169" barSize={25} />
+                    <Bar dataKey="loss" name={t('analytics.loss')} fill="#E53E3E" barSize={25} />
                   </BarChart>
                 </ResponsiveContainer>
+              </div>
+              <div className="mt-6">
+                <div className="text-xs text-muted-foreground text-center">
+                  {t('analytics.setupPerformanceNote')}
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -349,9 +381,9 @@ const Dashboard: React.FC<DashboardProps> = ({
         <TabsContent value="time">
           <Card>
             <CardHeader>
-              <CardTitle>Performance by Time of Day {dateRangeDisplay}</CardTitle>
+              <CardTitle>{t('analytics.timePerformance')} {dateRangeDisplay}</CardTitle>
               <CardDescription>
-                Which hours are most profitable for your trading
+                {t('analytics.timeDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -371,13 +403,13 @@ const Dashboard: React.FC<DashboardProps> = ({
                     <YAxis tickFormatter={(value) => `$${value}`} />
                     <Tooltip
                       formatter={(value, name) => {
-                        if (name === 'profit') return [formatCurrency(value as number), 'Profit/Loss'];
+                        if (name === 'profit') return [formatCurrency(value as number), t('analytics.profitLoss')];
                         return [value, name];
                       }}
                     />
                     <Legend />
-                    <Bar dataKey="profit" name="Profit/Loss" fill="#3b82f6" />
-                    <Bar dataKey="trades" name="Number of Trades" fill="#93c5fd" />
+                    <Bar dataKey="profit" name={t('analytics.profitLoss')} fill="#3b82f6" />
+                    <Bar dataKey="trades" name={t('analytics.numberOfTrades')} fill="#93c5fd" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
