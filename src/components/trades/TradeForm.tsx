@@ -36,7 +36,6 @@ import {
 import { Calendar } from '@/components/ui/calendar';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Trade, TradingDirection, TrendPosition } from '@/types';
 import { CalendarIcon } from 'lucide-react';
 import SearchableAssetSelect from './SearchableAssetSelect';
@@ -88,7 +87,7 @@ const TradeForm: React.FC<TradeFormProps> = ({ trade, onSubmit, onCancel }) => {
   const checkRiskLimit = () => {
     // Check if we are exceeding the daily risk limit
     const { riskSettings } = state;
-    if (!riskSettings || !riskSettings.dailyRiskLimit) return true;
+    if (!riskSettings || !riskSettings.maxDailyRisk) return true;
     
     const today = format(new Date(), 'yyyy-MM-dd');
     const todayLosses = state.trades
@@ -99,7 +98,7 @@ const TradeForm: React.FC<TradeFormProps> = ({ trade, onSubmit, onCancel }) => {
       )
       .reduce((sum, t) => sum + Math.abs(t.financialResult), 0);
     
-    return todayLosses < riskSettings.dailyRiskLimit;
+    return todayLosses < (riskSettings.maxDailyRisk || 0);
   };
   
   const form = useForm<z.infer<typeof formSchema>>({
@@ -147,8 +146,8 @@ const TradeForm: React.FC<TradeFormProps> = ({ trade, onSubmit, onCancel }) => {
       });
     }
     
-    // Set financialResult based on profitLossPercentage for backward compatibility
-    const tradeData = {
+    // Convert values to match Trade type
+    const tradeData: Partial<Trade> = {
       ...values,
       profitLossPercentage: values.profitLossPercentage || 0,
       financialResult: values.profitLossPercentage || 0
@@ -179,7 +178,6 @@ const TradeForm: React.FC<TradeFormProps> = ({ trade, onSubmit, onCancel }) => {
                   <FormItem>
                     <FormLabel>{t('trade.asset')}</FormLabel>
                     <SearchableAssetSelect
-                      assets={state.assets}
                       value={field.value}
                       onChange={field.onChange}
                     />

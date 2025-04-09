@@ -14,14 +14,14 @@ export type AssetType = {
   symbol: string;
 };
 
-export type Direction = 'Buy' | 'Sell';
-export type TrendPosition = 'With' | 'Against';
+export type TradingDirection = 'Buy' | 'Sell';
+export type TrendPosition = 'With' | 'Against' | 'Neutral';
 
 export type Trade = {
   id: string;
   asset: string;
   setupId: string;
-  direction: Direction;
+  direction: TradingDirection;
   trendPosition: TrendPosition;
   entryTime: Date;
   exitTime: Date;
@@ -34,6 +34,7 @@ export type Trade = {
   isModelTrade: boolean;
   createdAt: Date;
   riskRewardRatio?: string;
+  userId?: string;
 };
 
 export type DailyJournal = {
@@ -43,12 +44,14 @@ export type DailyJournal = {
   dailyComment: string;
   previousDayGoalHit: boolean | null;
   createdAt: Date;
+  userId?: string;
 };
 
 export type RiskSettings = {
   initialCapital: number;
   dailyProfitTarget: number; // percentage
   maxDailyRisk: number; // percentage
+  dailyRiskLimit: number; // dollar amount
 };
 
 // User roles including admin

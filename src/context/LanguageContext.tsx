@@ -5,6 +5,8 @@ interface LanguageContextType {
   language: string;
   t: (key: string) => string;
   changeLanguage: (lang: string) => void;
+  currentLanguage: string;
+  setLanguage: (lang: string) => void;
 }
 
 const defaultTranslations = {
@@ -112,7 +114,7 @@ const defaultTranslations = {
     'trade.neutralTrend': 'Neutral',
     'trade.profitLoss': 'Profit/Loss',
     'trade.profitLossPercentage': 'P/L %',
-    'trade.profitLossDescription': 'Profit or loss as a percentage of your position',
+    'trade.profitLossDescription': 'Profit or loss in dollars',
     'trade.profitLossAmountDescription': 'Profit or loss in dollars',
     'trade.leverageDescription': 'Trading leverage used (1x or higher)',
     'trade.notes': 'Trade Notes',
@@ -192,6 +194,8 @@ const defaultTranslations = {
     'settings.dailyRiskLimit': 'Daily Risk Limit',
     'settings.saveSettings': 'Save Settings',
     'settings.saved': 'Settings saved',
+    'settings.language': 'Language',
+    'settings.selectLanguage': 'Select language',
     
     // Users
     'users.title': 'Users',
@@ -227,6 +231,11 @@ const defaultTranslations = {
     'users.accessDenied': 'Access Denied',
     'users.analyticsFor': 'Analytics for',
     'users.analyticsDescription': 'Trading performance and metrics for this user',
+    'users.editUser': 'Edit User',
+    'users.addUser': 'Add User',
+    'users.selectRole': 'Select role',
+    'users.assignMentor': 'Assign Mentor',
+    'users.createUser': 'Create User',
   },
   pt: {
     // Common
@@ -332,7 +341,7 @@ const defaultTranslations = {
     'trade.neutralTrend': 'Neutro',
     'trade.profitLoss': 'Lucro/Perda',
     'trade.profitLossPercentage': 'L/P %',
-    'trade.profitLossDescription': 'Lucro ou perda como percentagem da sua posição',
+    'trade.profitLossDescription': 'Lucro ou perda em dólares',
     'trade.profitLossAmountDescription': 'Lucro ou perda em dólares',
     'trade.leverageDescription': 'Alavancagem de trading utilizada (1x ou maior)',
     'trade.notes': 'Notas da Operação',
@@ -412,6 +421,8 @@ const defaultTranslations = {
     'settings.dailyRiskLimit': 'Limite de Risco Diário',
     'settings.saveSettings': 'Salvar Configurações',
     'settings.saved': 'Configurações salvas',
+    'settings.language': 'Idioma',
+    'settings.selectLanguage': 'Selecione o idioma',
     
     // Users
     'users.title': 'Usuários',
@@ -447,6 +458,11 @@ const defaultTranslations = {
     'users.accessDenied': 'Acesso Negado',
     'users.analyticsFor': 'Análises para',
     'users.analyticsDescription': 'Desempenho e métricas de trading para este usuário',
+    'users.editUser': 'Editar Usuário',
+    'users.addUser': 'Adicionar Usuário',
+    'users.selectRole': 'Selecione a função',
+    'users.assignMentor': 'Atribuir Mentor',
+    'users.createUser': 'Criar Usuário',
   }
 };
 
@@ -455,6 +471,8 @@ const LanguageContext = createContext<LanguageContextType>({
   language: 'en',
   t: () => '',
   changeLanguage: () => {},
+  currentLanguage: 'en',
+  setLanguage: () => {},
 });
 
 // Language Provider component
@@ -475,7 +493,13 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
   
   return (
-    <LanguageContext.Provider value={{ language, t, changeLanguage }}>
+    <LanguageContext.Provider value={{ 
+      language, 
+      t, 
+      changeLanguage,
+      currentLanguage: language,
+      setLanguage: changeLanguage
+    }}>
       {children}
     </LanguageContext.Provider>
   );

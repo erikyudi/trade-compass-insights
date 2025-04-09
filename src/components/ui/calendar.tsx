@@ -96,12 +96,6 @@ function Calendar({
         },
       }}
       {...props}
-      styles={{
-        root: { backgroundColor: '#f9f9f9', borderRadius: '0.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
-        month: { margin: '0.5rem' },
-        day_selected: { backgroundColor: 'var(--primary)', color: 'white' },
-        ...props.styles
-      }}
     />
   );
 }
