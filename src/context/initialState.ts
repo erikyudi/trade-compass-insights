@@ -33,6 +33,7 @@ export const initialState: AppState = {
     initialCapital: 10000,
     dailyProfitTarget: 2,
     maxDailyRisk: 2,
+    dailyRiskLimit: 200, // Adding the dailyRiskLimit property with a default value
   },
   setups: DEFAULT_SETUPS,
   mistakeTypes: DEFAULT_MISTAKE_TYPES,
@@ -64,6 +65,11 @@ export const loadInitialState = (): AppState => {
           date: new Date(journal.date),
           createdAt: new Date(journal.createdAt),
         }));
+      }
+      
+      // Ensure riskSettings has all required properties
+      if (parsedState.riskSettings && !parsedState.riskSettings.dailyRiskLimit) {
+        parsedState.riskSettings.dailyRiskLimit = initialState.riskSettings.dailyRiskLimit;
       }
       
       return { ...initialState, ...parsedState };

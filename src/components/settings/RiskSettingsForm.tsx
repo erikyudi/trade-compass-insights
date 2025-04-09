@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useAppContext } from '@/context/AppContext';
 import { toast } from 'sonner';
+import { useLanguage } from '@/context/LanguageContext';
 
 import {
   Form,
@@ -46,6 +47,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 const RiskSettingsForm: React.FC = () => {
   const { state, updateRiskSettings } = useAppContext();
+  const { t } = useLanguage();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -62,18 +64,19 @@ const RiskSettingsForm: React.FC = () => {
       initialCapital: values.initialCapital,
       dailyProfitTarget: values.dailyProfitTarget,
       maxDailyRisk: values.maxDailyRisk,
+      dailyRiskLimit: state.riskSettings.dailyRiskLimit // Preserve the existing value
     };
     
     updateRiskSettings(updatedSettings);
-    toast.success('Risk settings updated');
+    toast.success(t('settings.riskUpdated', 'Risk settings updated'));
   };
 
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader>
-        <CardTitle>Risk Management Settings</CardTitle>
+        <CardTitle>{t('risk.management', 'Risk Management Settings')}</CardTitle>
         <CardDescription>
-          Configure your risk parameters to maintain discipline in your trading
+          {t('risk.description', 'Configure your risk parameters to maintain discipline in your trading')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -84,7 +87,7 @@ const RiskSettingsForm: React.FC = () => {
               name="initialCapital"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Initial Capital ($)</FormLabel>
+                  <FormLabel>{t('risk.initialCapital', 'Initial Capital ($)')}</FormLabel>
                   <FormControl>
                     <Input 
                       type="number" 
@@ -96,7 +99,7 @@ const RiskSettingsForm: React.FC = () => {
                     />
                   </FormControl>
                   <FormDescription>
-                    Your trading account starting balance
+                    {t('risk.initialCapitalDesc', 'Your trading account starting balance')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -108,7 +111,7 @@ const RiskSettingsForm: React.FC = () => {
               name="dailyProfitTarget"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Daily Profit Target (%)</FormLabel>
+                  <FormLabel>{t('risk.dailyProfit', 'Daily Profit Target (%)')}</FormLabel>
                   <FormControl>
                     <Input 
                       type="number" 
@@ -120,7 +123,7 @@ const RiskSettingsForm: React.FC = () => {
                     />
                   </FormControl>
                   <FormDescription>
-                    Your target daily profit as a percentage of initial capital
+                    {t('risk.dailyProfitDesc', 'Your target daily profit as a percentage of initial capital')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -132,7 +135,7 @@ const RiskSettingsForm: React.FC = () => {
               name="maxDailyRisk"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Maximum Daily Risk (%)</FormLabel>
+                  <FormLabel>{t('risk.maxDailyRisk', 'Maximum Daily Risk (%)')}</FormLabel>
                   <FormControl>
                     <Input 
                       type="number" 
@@ -144,7 +147,7 @@ const RiskSettingsForm: React.FC = () => {
                     />
                   </FormControl>
                   <FormDescription>
-                    The maximum percentage of your capital you're willing to risk in a single day
+                    {t('risk.maxDailyRiskDesc', 'The maximum percentage of your capital you\'re willing to risk in a single day')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -153,7 +156,7 @@ const RiskSettingsForm: React.FC = () => {
             
             <CardFooter className="flex justify-end px-0">
               <Button type="submit">
-                Save Risk Settings
+                {t('settings.save', 'Save Risk Settings')}
               </Button>
             </CardFooter>
           </form>

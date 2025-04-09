@@ -1,4 +1,3 @@
-
 export type SetupType = {
   id: string;
   name: string;
@@ -51,7 +50,7 @@ export type RiskSettings = {
   initialCapital: number;
   dailyProfitTarget: number; // percentage
   maxDailyRisk: number; // percentage
-  dailyRiskLimit: number; // dollar amount
+  dailyRiskLimit?: number; // dollar amount - making this optional since it's not being used
 };
 
 // User roles including admin
