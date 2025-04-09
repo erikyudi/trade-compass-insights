@@ -25,14 +25,10 @@ const CalendarPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   
   // Get dates that have trades
-  const tradeDates = new Set(
-    trades.map(trade => format(new Date(trade.entryTime), 'yyyy-MM-dd'))
-  );
+  const tradeDates = trades.map(trade => new Date(trade.entryTime));
   
   // Get dates that have journal entries
-  const journalDates = new Set(
-    journals.map(journal => format(new Date(journal.date), 'yyyy-MM-dd'))
-  );
+  const journalDates = journals.map(journal => new Date(journal.date));
   
   // Get trades for selected date
   const selectedDateStr = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '';
@@ -54,18 +50,6 @@ const CalendarPage: React.FC = () => {
   const winCount = tradesForSelectedDate.filter(trade => trade.financialResult > 0).length;
   const lossCount = tradesForSelectedDate.filter(trade => trade.financialResult <= 0).length;
   
-  // Calendar modifiers to highlight dates
-  function dateClassName(date: Date) {
-    const dateStr = format(date, 'yyyy-MM-dd');
-    const hasJournal = journalDates.has(dateStr);
-    const hasTrades = tradeDates.has(dateStr);
-    
-    if (hasJournal && hasTrades) return "bg-green-100 text-green-800 font-bold";
-    if (hasJournal) return "bg-blue-100 text-blue-800";
-    if (hasTrades) return "bg-yellow-100 text-yellow-800";
-    return "";
-  }
-  
   return (
     <div className="space-y-8">
       <div>
@@ -84,31 +68,21 @@ const CalendarPage: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="p-3 bg-white rounded-md">
+            <div className="rounded-md overflow-hidden shadow-sm">
               <CalendarComponent
                 mode="single"
                 selected={selectedDate}
                 onSelect={setSelectedDate}
                 className="pointer-events-auto"
-                modifiers={{
-                  trading: (date) => tradeDates.has(format(date, 'yyyy-MM-dd')),
-                  journal: (date) => journalDates.has(format(date, 'yyyy-MM-dd')),
-                }}
-                modifiersClassNames={{
-                  trading: "bg-yellow-100 text-yellow-800",
-                  journal: "bg-blue-100 text-blue-800",
-                }}
-                modifiersStyles={{
-                  trading: { backgroundColor: "var(--yellow-100)", color: "var(--yellow-800)" },
-                  journal: { backgroundColor: "var(--blue-100)", color: "var(--blue-800)" }
-                }}
+                tradesDates={tradeDates}
+                journalDates={journalDates}
               />
             </div>
             
             <div className="mt-4 space-y-2 text-sm">
               <div className="flex items-center">
-                <div className="w-4 h-4 bg-blue-100 rounded mr-2"></div>
-                <span>Journal Entry</span>
+                <div className="w-4 h-4 bg-blue-50 border border-blue-200 rounded mr-2"></div>
+                <span>Today</span>
               </div>
               <div className="flex items-center">
                 <div className="w-4 h-4 bg-yellow-100 rounded mr-2"></div>
@@ -136,19 +110,19 @@ const CalendarPage: React.FC = () => {
               {tradesForSelectedDate.length > 0 ? (
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-slate-50 p-4 rounded-lg">
+                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
                       <div className="text-sm font-medium">Daily Profit/Loss</div>
                       <div className={`text-xl font-bold ${dailyProfit >= 0 ? 'text-profit' : 'text-loss'}`}>
                         {formatCurrency(dailyProfit)}
                       </div>
                     </div>
-                    <div className="bg-slate-50 p-4 rounded-lg">
+                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
                       <div className="text-sm font-medium">Trades</div>
                       <div className="text-xl font-bold">
                         {tradesForSelectedDate.length}
                       </div>
                     </div>
-                    <div className="bg-slate-50 p-4 rounded-lg">
+                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
                       <div className="text-sm font-medium">Win / Loss</div>
                       <div className="text-xl font-bold">
                         {winCount} W / {lossCount} L

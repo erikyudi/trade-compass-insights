@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   BarChart, 
@@ -14,7 +15,7 @@ import {
   Cell,
   Legend
 } from 'recharts';
-import { format, subDays } from 'date-fns';
+import { format, subDays, startOfDay, endOfDay, isWithinInterval } from 'date-fns';
 import { useAppContext } from '@/context/AppContext';
 import { Trade } from '@/types';
 
@@ -22,31 +23,61 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '@/context/LanguageContext';
 
-const Dashboard: React.FC = () => {
+interface DashboardProps {
+  userData?: {
+    trades: Trade[];
+    journals: any[];
+    setups: any[];
+  };
+  startDate?: Date;
+  endDate?: Date;
+  dateRangeApplied?: boolean;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ 
+  userData,
+  startDate,
+  endDate,
+  dateRangeApplied = false
+}) => {
   const { state } = useAppContext();
-  const { trades, setups, journals } = state;
+  const { t } = useLanguage();
   const navigate = useNavigate();
   
-  // Filter for recent trades (last 7 days)
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // Use provided userData or fall back to global state
+  const { trades, journals, setups } = userData || state;
   
-  const recentTrades = trades.filter(trade => 
-    new Date(trade.entryTime) >= subDays(today, 30)
-  );
+  // Filter data by date range if provided
+  const filteredTrades = startDate && endDate && dateRangeApplied
+    ? trades.filter(trade => {
+        const tradeDate = new Date(trade.entryTime);
+        return isWithinInterval(tradeDate, { start: startDate, end: endDate });
+      })
+    : trades;
   
-  // Calculate key metrics
-  const totalProfitLoss = trades.reduce((sum, trade) => sum + trade.financialResult, 0);
-  const winCount = trades.filter(trade => trade.financialResult > 0).length;
-  const winRate = trades.length > 0 ? (winCount / trades.length * 100).toFixed(1) : '0.0';
-  const mistakeCount = trades.filter(trade => trade.isMistake).length;
+  const filteredJournals = startDate && endDate && dateRangeApplied
+    ? journals.filter(journal => {
+        const journalDate = new Date(journal.date);
+        return isWithinInterval(journalDate, { start: startDate, end: endDate });
+      })
+    : journals;
   
-  // Removed risk/reward ratio as requested
+  // Format date range for display
+  const dateRangeDisplay = startDate && endDate
+    ? `${format(startDate, 'MMM d, yyyy')} - ${format(endDate, 'MMM d, yyyy')}`
+    : "(30 Days)";
+  
+  // Calculate key metrics based on filtered data
+  const totalProfitLoss = filteredTrades.reduce((sum, trade) => sum + trade.financialResult, 0);
+  const winCount = filteredTrades.filter(trade => trade.financialResult > 0).length;
+  const winRate = filteredTrades.length > 0 ? (winCount / filteredTrades.length * 100).toFixed(1) : '0.0';
+  const mistakeCount = filteredTrades.filter(trade => trade.isMistake).length;
   
   // Data for setup performance
   const setupPerformance = setups.map(setup => {
-    const setupTrades = trades.filter(trade => trade.setupId === setup.id);
+    const setupTrades = filteredTrades.filter(trade => trade.setupId === setup.id);
     const setupProfit = setupTrades.reduce((sum, trade) => sum + trade.financialResult, 0);
     const setupWins = setupTrades.filter(trade => trade.financialResult > 0).length;
     const setupWinRate = setupTrades.length > 0 ? (setupWins / setupTrades.length * 100) : 0;
@@ -70,7 +101,10 @@ const Dashboard: React.FC = () => {
   // Group trades by date
   const tradesByDate = new Map<string, Trade[]>();
   
-  recentTrades.forEach(trade => {
+  // Use either filtered trades or recent trades
+  const tradesForLineChart = filteredTrades;
+  
+  tradesForLineChart.forEach(trade => {
     const dateStr = format(new Date(trade.entryTime), 'yyyy-MM-dd');
     if (!tradesByDate.has(dateStr)) {
       tradesByDate.set(dateStr, []);
@@ -105,7 +139,7 @@ const Dashboard: React.FC = () => {
     { timeSlot: '16+', profit: 0, trades: 0 },
   ];
   
-  trades.forEach(trade => {
+  filteredTrades.forEach(trade => {
     const hour = new Date(trade.entryTime).getHours();
     let index;
     
@@ -122,40 +156,10 @@ const Dashboard: React.FC = () => {
   // Win/Loss Ratio
   const winLossData = [
     { name: 'Win', value: winCount },
-    { name: 'Loss', value: trades.length - winCount }
+    { name: 'Loss', value: filteredTrades.length - winCount }
   ];
   
   const COLORS = ['#38A169', '#E53E3E'];
-  
-  // Journal impact
-  const tradesWithJournal = trades.filter(trade => {
-    const tradeDate = new Date(trade.entryTime).toDateString();
-    return journals.some(journal => 
-      new Date(journal.date).toDateString() === tradeDate && 
-      journal.errorReviewCompleted
-    );
-  });
-  
-  const tradesWithoutJournal = trades.filter(trade => {
-    const tradeDate = new Date(trade.entryTime).toDateString();
-    return !journals.some(journal => 
-      new Date(journal.date).toDateString() === tradeDate && 
-      journal.errorReviewCompleted
-    );
-  });
-  
-  const avgProfitWithJournal = tradesWithJournal.length > 0 
-    ? tradesWithJournal.reduce((sum, trade) => sum + trade.financialResult, 0) / tradesWithJournal.length
-    : 0;
-    
-  const avgProfitWithoutJournal = tradesWithoutJournal.length > 0 
-    ? tradesWithoutJournal.reduce((sum, trade) => sum + trade.financialResult, 0) / tradesWithoutJournal.length
-    : 0;
-    
-  const journalImpactData = [
-    { name: 'With Journal', profit: avgProfitWithJournal },
-    { name: 'Without Journal', profit: avgProfitWithoutJournal }
-  ];
   
   // Format currency
   const formatCurrency = (value: number) => {
@@ -189,12 +193,10 @@ const Dashboard: React.FC = () => {
           <CardContent>
             <p className="text-3xl font-bold">{winRate}%</p>
             <p className="text-sm text-muted-foreground">
-              ({winCount}/{trades.length} trades)
+              ({winCount}/{filteredTrades.length} trades)
             </p>
           </CardContent>
         </Card>
-        
-        {/* Removed Risk/Reward card as requested */}
         
         <Card>
           <CardHeader className="pb-2">
@@ -204,7 +206,7 @@ const Dashboard: React.FC = () => {
           <CardContent>
             <p className="text-3xl font-bold">{mistakeCount}</p>
             <p className="text-sm text-muted-foreground">
-              ({(mistakeCount / (trades.length || 1) * 100).toFixed(1)}% of trades)
+              ({(mistakeCount / (filteredTrades.length || 1) * 100).toFixed(1)}% of trades)
             </p>
           </CardContent>
         </Card>
@@ -216,8 +218,8 @@ const Dashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">
-              {trades.length > 0 
-                ? (trades.reduce((sum, trade) => sum + trade.leverage, 0) / trades.length).toFixed(1) 
+              {filteredTrades.length > 0 
+                ? (filteredTrades.reduce((sum, trade) => sum + trade.leverage, 0) / filteredTrades.length).toFixed(1) 
                 : '0.0'}x
             </p>
           </CardContent>
@@ -226,18 +228,17 @@ const Dashboard: React.FC = () => {
       
       <Tabs defaultValue="profit">
         <TabsList>
-          <TabsTrigger value="profit">Profit History</TabsTrigger>
-          <TabsTrigger value="setup">Setup Performance</TabsTrigger>
-          <TabsTrigger value="time">Time of Day</TabsTrigger>
-          <TabsTrigger value="analytics">Advanced Analytics</TabsTrigger>
+          <TabsTrigger value="profit">{t('analytics.profitHistory')}</TabsTrigger>
+          <TabsTrigger value="setup">{t('analytics.setupPerformance')}</TabsTrigger>
+          <TabsTrigger value="time">{t('analytics.timeOfDay')}</TabsTrigger>
         </TabsList>
         
         <TabsContent value="profit" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Profit/Loss Trend (30 Days)</CardTitle>
+              <CardTitle>Profit/Loss Trend {dateRangeDisplay}</CardTitle>
               <CardDescription>
-                Daily P&L for the past month
+                Daily P&L for the selected time period
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -307,7 +308,7 @@ const Dashboard: React.FC = () => {
         <TabsContent value="setup">
           <Card>
             <CardHeader>
-              <CardTitle>Setup Performance</CardTitle>
+              <CardTitle>Setup Performance {dateRangeDisplay}</CardTitle>
               <CardDescription>
                 Profit/loss by trading setup
               </CardDescription>
@@ -348,7 +349,7 @@ const Dashboard: React.FC = () => {
         <TabsContent value="time">
           <Card>
             <CardHeader>
-              <CardTitle>Performance by Time of Day</CardTitle>
+              <CardTitle>Performance by Time of Day {dateRangeDisplay}</CardTitle>
               <CardDescription>
                 Which hours are most profitable for your trading
               </CardDescription>
@@ -379,65 +380,6 @@ const Dashboard: React.FC = () => {
                     <Bar dataKey="trades" name="Number of Trades" fill="#93c5fd" />
                   </BarChart>
                 </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="analytics">
-          <Card>
-            <CardHeader>
-              <CardTitle>Journal Impact Analysis</CardTitle>
-              <CardDescription>
-                Compare performance with and without daily journal completion
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={journalImpactData}
-                    margin={{
-                      top: 5,
-                      right: 30,
-                      left: 20,
-                      bottom: 5,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis tickFormatter={(value) => `$${value}`} />
-                    <Tooltip
-                      formatter={(value) => [formatCurrency(value as number), 'Avg Profit/Loss']}
-                    />
-                    <Bar 
-                      dataKey="profit" 
-                      name="Average P/L per Trade" 
-                      fill="#3b82f6"
-                      label={{ position: 'top', formatter: (value) => formatCurrency(value) }}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-              
-              <div className="mt-6 flex flex-col gap-4">
-                <div>
-                  <h3 className="font-medium">Trades with Journal:</h3>
-                  <p className="text-muted-foreground">
-                    {tradesWithJournal.length} trades with average P/L of {formatCurrency(avgProfitWithJournal)}
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-medium">Trades without Journal:</h3>
-                  <p className="text-muted-foreground">
-                    {tradesWithoutJournal.length} trades with average P/L of {formatCurrency(avgProfitWithoutJournal)}
-                  </p>
-                </div>
-                <div className="mt-4">
-                  <Button onClick={() => navigate('/journal')}>
-                    Complete Today's Journal
-                  </Button>
-                </div>
               </div>
             </CardContent>
           </Card>

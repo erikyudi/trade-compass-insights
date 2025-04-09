@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { format, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns';
+import { format, startOfMonth, endOfMonth, addMonths, subMonths, startOfDay, endOfDay } from 'date-fns';
 import { useLanguage } from '@/context/LanguageContext';
 import Dashboard from '@/components/dashboard/Dashboard';
 import { 
@@ -12,14 +12,6 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Popover,
   PopoverContent,
@@ -36,6 +28,7 @@ const AnalyticsPage: React.FC = () => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [startDate, setStartDate] = useState<Date>(startOfMonth(new Date()));
   const [endDate, setEndDate] = useState<Date>(endOfMonth(new Date()));
+  const [dateRangeApplied, setDateRangeApplied] = useState(false);
   
   const handlePreviousMonth = () => {
     setCurrentMonth(subMonths(currentMonth, 1));
@@ -46,6 +39,7 @@ const AnalyticsPage: React.FC = () => {
   };
   
   const applyFilter = () => {
+    setDateRangeApplied(true);
     console.log('Applied filter:', filterType === 'month' 
       ? { month: currentMonth } 
       : { startDate, endDate });
@@ -56,7 +50,17 @@ const AnalyticsPage: React.FC = () => {
     setCurrentMonth(new Date());
     setStartDate(startOfMonth(new Date()));
     setEndDate(endOfMonth(new Date()));
+    setDateRangeApplied(false);
   };
+
+  // Compute the actual date range for filtering
+  const effectiveStartDate = filterType === 'month' 
+    ? startOfMonth(currentMonth) 
+    : startOfDay(startDate);
+  
+  const effectiveEndDate = filterType === 'month' 
+    ? endOfMonth(currentMonth) 
+    : endOfDay(endDate);
 
   return (
     <div className="space-y-8">
@@ -165,7 +169,11 @@ const AnalyticsPage: React.FC = () => {
         </CardContent>
       </Card>
       
-      <Dashboard />
+      <Dashboard 
+        startDate={effectiveStartDate}
+        endDate={effectiveEndDate}
+        dateRangeApplied={dateRangeApplied}
+      />
     </div>
   );
 };

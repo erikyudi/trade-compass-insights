@@ -1,214 +1,154 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
-import Logo from '@/components/branding/Logo';
+import { toast } from 'sonner';
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from 'sonner';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import Logo from '@/components/branding/Logo';
+
+const formSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 const LoginPage: React.FC = () => {
-  const { t, currentLanguage, setLanguage } = useLanguage();
-  const { login } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
-  
-  const [email, setEmail] = useState('admin@example.com');
-  const [password, setPassword] = useState('123456');
-  const [rememberMe, setRememberMe] = useState(false);
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   
-  // Forgot password functionality
-  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
-  const [resetEmail, setResetEmail] = useState('');
-  const [isResetting, setIsResetting] = useState(false);
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
   
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: FormData) => {
     setIsLoading(true);
-    
     try {
-      await login(email, password);
+      await login(data.email, data.password);
+      toast.success(t('login.success'));
       navigate('/');
     } catch (error) {
-      let errorMessage = 'Invalid credentials';
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      toast.error(errorMessage);
+      console.error('Login error:', error);
+      toast.error(t('login.failed'), {
+        description: t('login.tryAgain')
+      });
     } finally {
       setIsLoading(false);
     }
   };
   
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsResetting(true);
-    
-    // Mock API call for password reset
-    try {
-      // In a real app, this would call your auth/forgot-password endpoint
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success(t('login.resetLinkSent'));
-      setForgotPasswordOpen(false);
-      setResetEmail('');
-    } catch (error) {
-      toast.error(t('login.resetError'));
-    } finally {
-      setIsResetting(false);
-    }
+  const handleResetPassword = () => {
+    navigate('/reset-password');
   };
-  
-  const toggleLanguage = () => {
-    if (currentLanguage === 'en-US') {
-      setLanguage('pt-BR');
-    } else {
-      setLanguage('en-US');
-    }
-  };
-  
+
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-background p-4">
-      <div className="w-full max-w-md">
-        <div className="flex justify-center mb-8">
-          <Logo size="lg" />
-        </div>
-        
-        <div className="bg-card border border-border rounded-lg shadow-xl p-8">
-          <h1 className="text-2xl font-bold text-center mb-6">
-            {t('login.title')}
-          </h1>
-          
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium">
-                {t('login.email')}
-              </label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-              />
+    <div className="flex items-center justify-center min-h-screen bg-gray-900">
+      <div className="w-full max-w-md px-4">
+        <Card className="border-gray-700 bg-gray-800 shadow-lg">
+          <CardHeader className="space-y-4 pb-6">
+            <div className="mx-auto mb-4">
+              <Logo />
             </div>
-            
-            <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium">
-                {t('login.password')}
-              </label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="remember"
-                  checked={rememberMe}
-                  onCheckedChange={(checked) => 
-                    setRememberMe(checked as boolean)
-                  }
+            <CardTitle className="text-2xl text-center text-white">
+              {t('login.title')}
+            </CardTitle>
+            <CardDescription className="text-center text-gray-400">
+              {t('login.description')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-200">
+                        {t('login.email')}
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="email@example.com"
+                          {...field}
+                          autoComplete="email"
+                          className="bg-gray-700 border-gray-600 text-white"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <label
-                  htmlFor="remember"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-200">
+                        {t('login.password')}
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          {...field}
+                          autoComplete="current-password"
+                          className="bg-gray-700 border-gray-600 text-white"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="submit"
+                  className="w-full bg-orange-500 hover:bg-orange-600 mt-4"
+                  disabled={isLoading}
                 >
-                  {t('login.rememberMe')}
-                </label>
-              </div>
-              
-              <button 
-                type="button" 
-                onClick={() => setForgotPasswordOpen(true)}
-                className="text-sm text-primary hover:underline"
-              >
-                {t('login.forgotPassword')}
-              </button>
-            </div>
-            
+                  {isLoading ? t('login.loggingIn') : t('login.submit')}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+          <CardFooter className="flex-col space-y-4 pt-0">
             <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
+              variant="link"
+              className="text-orange-400 hover:text-orange-300"
+              onClick={handleResetPassword}
             >
-              {isLoading ? t('common.loading') : t('login.submit')}
+              {t('login.forgotPassword')}
             </Button>
-          </form>
-          
-          <div className="mt-6 text-center text-sm">
-            <p className="text-muted-foreground">
-              {t('login.noAccount')}{' '}
-              <a href="#" className="text-primary hover:underline">
-                {t('login.signUp')}
-              </a>
-            </p>
-          </div>
-          
-          <div className="mt-4 text-center">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleLanguage}
-              className="text-xs"
-            >
-              {t('login.switchLanguage')}
-            </Button>
-          </div>
-        </div>
+          </CardFooter>
+        </Card>
       </div>
-      
-      {/* Forgot Password Dialog */}
-      <Dialog open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t('login.resetPassword')}</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleForgotPassword} className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label htmlFor="reset-email" className="block text-sm font-medium">
-                {t('login.email')}
-              </label>
-              <Input
-                id="reset-email"
-                type="email"
-                value={resetEmail}
-                onChange={(e) => setResetEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-              />
-              <p className="text-sm text-muted-foreground">
-                {t('login.resetInstructions')}
-              </p>
-            </div>
-            
-            <DialogFooter className="flex justify-between items-center mt-4">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setForgotPasswordOpen(false)}
-              >
-                {t('common.cancel')}
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={isResetting || !resetEmail}
-              >
-                {isResetting ? t('common.sending') : t('login.sendResetLink')}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

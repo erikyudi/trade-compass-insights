@@ -58,15 +58,15 @@ function Calendar({
         head_cell:
           "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
         row: "flex w-full mt-2",
-        cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+        cell: "h-9 w-9 text-center text-sm p-0 relative rounded-md overflow-hidden border border-transparent hover:bg-accent/20 [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
         day: cn(
           buttonVariants({ variant: "ghost" }),
-          "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
+          "h-9 w-9 p-0 font-normal aria-selected:opacity-100 rounded-md"
         ),
         day_range_end: "day-range-end",
         day_selected:
           "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-        day_today: "bg-accent text-accent-foreground",
+        day_today: "bg-blue-50 border border-blue-200 text-blue-800 font-semibold",
         day_outside:
           "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
         day_disabled: "text-muted-foreground opacity-50",
@@ -77,7 +77,7 @@ function Calendar({
       }}
       modifiersClassNames={{
         ...props.modifiersClassNames,
-        today: "bg-accent text-accent-foreground",
+        today: "bg-blue-50 border border-blue-200 text-blue-800 font-semibold",
       }}
       modifiers={{
         ...props.modifiers,
@@ -90,12 +90,18 @@ function Calendar({
           const customClass = getDayClassName(props.date);
           return (
             <div className={`h-full w-full flex items-center justify-center ${customClass}`}>
-              <span className="inline-block text-center">{props.date.getDate()}</span>
+              <span className="inline-block text-center w-full">{props.date.getDate()}</span>
             </div>
           );
         },
       }}
       {...props}
+      styles={{
+        root: { backgroundColor: '#f9f9f9', borderRadius: '0.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
+        month: { margin: '0.5rem' },
+        day_selected: { backgroundColor: 'var(--primary)', color: 'white' },
+        ...props.styles
+      }}
     />
   );
 }

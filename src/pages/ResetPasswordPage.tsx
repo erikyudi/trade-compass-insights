@@ -1,162 +1,136 @@
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import Logo from '@/components/branding/Logo';
+
+const formSchema = z.object({
+  email: z.string().email(),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 const ResetPasswordPage: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
+  const [isLoading, setIsLoading] = useState(false);
   
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [isValidToken, setIsValidToken] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: '',
+    },
+  });
   
-  // Mock function to verify token
-  useEffect(() => {
-    const verifyToken = async () => {
-      try {
-        // In a real app, you would verify the token with your backend
-        // For now, we'll just simulate a valid token if it exists
-        await new Promise(resolve => setTimeout(resolve, 500));
-        if (token) {
-          setIsValidToken(true);
-        } else {
-          setIsValidToken(false);
-          toast.error(t('resetPassword.invalidToken'));
-        }
-      } catch (error) {
-        setIsValidToken(false);
-        toast.error(t('resetPassword.verificationError'));
-      }
-    };
-    
-    verifyToken();
-  }, [token, t]);
-  
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (password !== confirmPassword) {
-      toast.error(t('resetPassword.passwordsDoNotMatch'));
-      return;
-    }
-    
-    if (password.length < 6) {
-      toast.error(t('resetPassword.passwordTooShort'));
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
+  const onSubmit = async (data: FormData) => {
+    setIsLoading(true);
     try {
-      // In a real app, you would call your backend API to reset the password
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Mock API call for password reset
+      // In a real app, you would call an API endpoint here
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      toast.success(t('resetPassword.success'));
-      navigate('/login');
+      toast.success(t('login.resetSent'), {
+        description: t('login.checkEmail')
+      });
+      
+      // Redirect back to login page after a short delay
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } catch (error) {
-      toast.error(t('resetPassword.error'));
+      console.error('Reset password error:', error);
+      toast.error(t('login.resetFailed'), {
+        description: t('login.tryAgain')
+      });
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
   
-  if (!token) {
-    return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-background p-4">
-        <div className="w-full max-w-md text-center">
-          <Logo size="md" className="mx-auto mb-6" />
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('resetPassword.invalidToken')}</CardTitle>
-              <CardDescription>
-                {t('resetPassword.tokenRequired')}
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <Button 
-                className="w-full" 
-                onClick={() => navigate('/login')}
-              >
-                {t('common.backToLogin')}
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-  
+  const handleBackToLogin = () => {
+    navigate('/login');
+  };
+
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-background p-4">
-      <div className="w-full max-w-md">
-        <Logo size="md" className="mx-auto mb-6" />
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('resetPassword.title')}</CardTitle>
-            <CardDescription>
-              {t('resetPassword.instructions')}
+    <div className="flex items-center justify-center min-h-screen bg-gray-900">
+      <div className="w-full max-w-md px-4">
+        <Card className="border-gray-700 bg-gray-800 shadow-lg">
+          <CardHeader className="space-y-4 pb-6">
+            <div className="mx-auto mb-4">
+              <Logo />
+            </div>
+            <CardTitle className="text-2xl text-center text-white">
+              {t('login.resetPassword')}
+            </CardTitle>
+            <CardDescription className="text-center text-gray-400">
+              {t('login.resetInstructions')}
             </CardDescription>
           </CardHeader>
-          
-          <form onSubmit={handleResetPassword}>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-medium">
-                  {t('resetPassword.newPassword')}
-                </label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  disabled={!isValidToken || isSubmitting}
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-200">
+                        {t('login.email')}
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="email@example.com"
+                          {...field}
+                          autoComplete="email"
+                          className="bg-gray-700 border-gray-600 text-white"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              
-              <div className="space-y-2">
-                <label htmlFor="confirm-password" className="block text-sm font-medium">
-                  {t('resetPassword.confirmPassword')}
-                </label>
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  disabled={!isValidToken || isSubmitting}
-                />
-              </div>
-            </CardContent>
-            
-            <CardFooter className="flex justify-between">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => navigate('/login')}
-              >
-                {t('common.cancel')}
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={!isValidToken || isSubmitting || !password || !confirmPassword}
-              >
-                {isSubmitting ? t('common.submitting') : t('resetPassword.resetPassword')}
-              </Button>
-            </CardFooter>
-          </form>
+                <Button
+                  type="submit"
+                  className="w-full bg-orange-500 hover:bg-orange-600 mt-4"
+                  disabled={isLoading}
+                >
+                  {isLoading ? t('login.sending') : t('login.sendResetLink')}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+          <CardFooter className="flex-col space-y-4 pt-0">
+            <Button
+              variant="link"
+              className="text-orange-400 hover:text-orange-300"
+              onClick={handleBackToLogin}
+            >
+              {t('login.backToLogin')}
+            </Button>
+          </CardFooter>
         </Card>
       </div>
     </div>
