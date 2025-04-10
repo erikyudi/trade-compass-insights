@@ -35,6 +35,13 @@ const AnalyticsPage: React.FC = () => {
     applyFilter();
   }, []);
   
+  // Also apply filter whenever the month changes
+  useEffect(() => {
+    if (filterType === 'month') {
+      applyFilter();
+    }
+  }, [currentMonth, filterType]);
+  
   const handlePreviousMonth = () => {
     setCurrentMonth(subMonths(currentMonth, 1));
   };

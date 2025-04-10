@@ -14,11 +14,13 @@ import {
   Pie,
   Cell,
   Legend,
-  ReferenceLine
+  ReferenceLine,
+  ComposedChart
 } from 'recharts';
 import { format, isWithinInterval } from 'date-fns';
 import { useAppContext } from '@/context/AppContext';
 import { Trade } from '@/types';
+import { formatCurrency } from '@/context/appUtils';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -173,15 +175,6 @@ const Dashboard: React.FC<DashboardProps> = ({
   
   const COLORS = ['#38A169', '#E53E3E'];
   
-  // Format currency
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-    }).format(value);
-  };
-  
   // Custom tooltip for the setup performance chart
   const SetupPerformanceTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -190,8 +183,8 @@ const Dashboard: React.FC<DashboardProps> = ({
       return (
         <div className="bg-background border border-input p-3 rounded-md shadow-md">
           <p className="font-medium">{`Setup: ${label}`}</p>
-          <p className="text-profit">{`Profit: ${formatCurrency(setupData.profit)}`}</p>
-          <p className="text-loss">{`Loss: ${formatCurrency(-setupData.loss)}`}</p>
+          <p className="text-green-600">{`Profit: ${formatCurrency(setupData.profit)}`}</p>
+          <p className="text-red-600">{`Loss: ${formatCurrency(-setupData.loss)}`}</p>
           <p>{`Net: ${formatCurrency(setupData.profit + setupData.actualLoss)}`}</p>
           <p>{`Win Rate: ${setupData.winRate.toFixed(1)}%`}</p>
           <p>{`Wins/Losses: ${setupData.winCount}/${setupData.lossCount}`}</p>
@@ -212,7 +205,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <CardDescription>{t('analytics.overallPerformance')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className={`text-3xl font-bold ${totalProfitLoss >= 0 ? 'text-profit' : 'text-loss'}`}>
+            <p className={`text-3xl font-bold ${totalProfitLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               {formatCurrency(totalProfitLoss)}
             </p>
           </CardContent>
@@ -349,7 +342,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <CardContent>
               <div className="h-96">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
+                  <ComposedChart
                     data={setupPerformance}
                     margin={{
                       top: 20,
@@ -360,13 +353,23 @@ const Dashboard: React.FC<DashboardProps> = ({
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
-                    <YAxis tickFormatter={(value) => `$${value}`} />
-                    <ReferenceLine y={0} stroke="#000" />
+                    <YAxis yAxisId="left" tickFormatter={(value) => `$${value}`} />
+                    <YAxis yAxisId="right" orientation="right" domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
+                    <ReferenceLine yAxisId="left" y={0} stroke="#000" />
                     <Tooltip content={<SetupPerformanceTooltip />} />
                     <Legend />
-                    <Bar dataKey="profit" name={t('analytics.profit')} fill="#38A169" barSize={25} />
-                    <Bar dataKey="loss" name={t('analytics.loss')} fill="#E53E3E" barSize={25} />
-                  </BarChart>
+                    <Bar yAxisId="left" dataKey="profit" name={t('analytics.profit')} fill="#38A169" barSize={25} />
+                    <Bar yAxisId="left" dataKey="loss" name={t('analytics.loss')} fill="#E53E3E" barSize={25} />
+                    <Line 
+                      yAxisId="right" 
+                      type="monotone" 
+                      dataKey="winRate" 
+                      name={t('analytics.winRate')} 
+                      stroke="#1E40AF" 
+                      strokeWidth={2}
+                      dot={{ r: 6 }}
+                    />
+                  </ComposedChart>
                 </ResponsiveContainer>
               </div>
               <div className="mt-6">

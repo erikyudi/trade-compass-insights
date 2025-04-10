@@ -32,6 +32,13 @@ const TraderAnalytics: React.FC<TraderAnalyticsProps> = ({ userId }) => {
     applyFilter();
   }, []);
 
+  // Also apply filter whenever the month changes
+  useEffect(() => {
+    if (filterType === 'month') {
+      applyFilter();
+    }
+  }, [currentMonth, filterType]);
+
   // Filter user data by userId
   const userData = {
     trades: state.trades.filter(trade => trade.userId === userId),

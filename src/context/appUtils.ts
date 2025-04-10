@@ -1,3 +1,4 @@
+
 import { AppState } from './types';
 
 // Function to determine if a daily journal entry exists for today
@@ -33,4 +34,23 @@ export const getDailyRiskStatus = (state: AppState): 'safe' | 'warning' | 'dange
 // Function to check if the daily risk limit has been exceeded
 export const checkRiskLimit = (state: AppState): boolean => {
   return state.dailyRiskUsed > state.riskSettings.maxDailyRisk;
+};
+
+// Function to format currency values
+export const formatCurrency = (value: number): string => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+  }).format(value);
+};
+
+// Function to format dates
+export const formatDate = (date: Date | string): string => {
+  const dateObj = date instanceof Date ? date : new Date(date);
+  return dateObj.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 };
